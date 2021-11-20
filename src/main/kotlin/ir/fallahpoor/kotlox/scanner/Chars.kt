@@ -1,0 +1,28 @@
+package ir.fallahpoor.kotlox.scanner
+
+object Chars {
+    const val NEW_LINE = '\n'
+    const val TAB = '\t'
+    const val RETURN = '\r'
+    const val SPACE = ' '
+    const val DOUBLE_QUOTES = '"'
+    const val UNDERSCORE = '_'
+    const val DOT = '.'
+    const val LEFT_PAREN = '('
+    const val RIGHT_PAREN = ')'
+    const val LEFt_BRACE = '{'
+    const val RIGHT_BRACE = '}'
+    const val COMMA = ','
+    const val MINUS = '-'
+    const val PLUS = '+'
+    const val SEMICOLON = ';'
+    const val STAR = '*'
+    const val BANG = '!'
+    const val EQUAL = '='
+    const val LESS = '<'
+    const val GREATER = '>'
+    const val SLASH = '/'
+    val DIGITS = '0'..'9'
+    val ALPHA_LOWER_CASE = 'a'..'z'
+    val ALPHA_UPPER_CASE = 'A'..'z'
+}
