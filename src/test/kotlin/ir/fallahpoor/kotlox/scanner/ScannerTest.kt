@@ -16,6 +16,10 @@ class ScannerTest {
     @Mock
     private lateinit var errorReporter: ErrorReporter
 
+    private fun createScannerWithSource(source: String) = Scanner(source.trimIndent(), errorReporter)
+
+    private fun createEofToken(line: Int) = Token(TokenType.EOF, "", null, line)
+
     @Test
     fun emptySource() {
 
@@ -26,9 +30,7 @@ class ScannerTest {
         val actualTokens = scanner.scanTokens()
 
         // Then
-        val expectedTokens = listOf(
-            Token(TokenType.EOF, "", null, 1)
-        )
+        val expectedTokens = listOf(createEofToken(1))
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
     }
@@ -47,9 +49,7 @@ class ScannerTest {
         val actualTokens = scanner.scanTokens()
 
         // Then
-        val expectedTokens = listOf(
-            Token(TokenType.EOF, "", null, 1)
-        )
+        val expectedTokens = listOf(createEofToken(1))
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
     }
@@ -71,7 +71,7 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(
             Token(TokenType.TRUE, "true", null, 2),
-            Token(TokenType.EOF, "", null, 2)
+            createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -100,7 +100,7 @@ class ScannerTest {
         val expectedTokens = listOf(
             Token(TokenType.FOR, "for", null, 1),
             Token(TokenType.NUMBER, "123", 123.0, 7),
-            Token(TokenType.EOF, "", null, 7)
+            createEofToken(7)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -124,7 +124,7 @@ class ScannerTest {
         val expectedTokens = listOf(
             Token(TokenType.NUMBER, "123", 123.0, 1),
             Token(TokenType.NUMBER, "123.456", 123.456, 2),
-            Token(TokenType.EOF, "", null, 2)
+            createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -150,7 +150,7 @@ class ScannerTest {
             Token(TokenType.IDENTIFIER, "formation", null, 1),
             Token(TokenType.IDENTIFIER, "_private", null, 2),
             Token(TokenType.IDENTIFIER, "ARRAY_LENGTH", null, 3),
-            Token(TokenType.EOF, "", null, 3)
+            createEofToken(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -175,7 +175,7 @@ class ScannerTest {
         val expectedTokens = listOf(
             Token(TokenType.STRING, "\"This is a string\"", "This is a string", 1),
             Token(TokenType.STRING, "\"This is a multi-line\nstring\"", "This is a multi-line\nstring", 3),
-            Token(TokenType.EOF, "", null, 3)
+            createEofToken(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -208,7 +208,7 @@ class ScannerTest {
             Token(TokenType.SEMICOLON, ";", null, 2),
             Token(TokenType.STAR, "*", null, 2),
             Token(TokenType.SLASH, "/", null, 2),
-            Token(TokenType.EOF, "", null, 2)
+            createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -237,7 +237,7 @@ class ScannerTest {
             Token(TokenType.GREATER_EQUAL, ">=", null, 1),
             Token(TokenType.LESS_EQUAL, "<=", null, 1),
             Token(TokenType.LESS, "<", null, 1),
-            Token(TokenType.EOF, "", null, 1)
+            createEofToken(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -279,7 +279,7 @@ class ScannerTest {
             Token(TokenType.IDENTIFIER, "classic", null, 2),
             Token(TokenType.IDENTIFIER, "elsewhere", null, 2),
             Token(TokenType.IDENTIFIER, "superstitious", null, 2),
-            Token(TokenType.EOF, "", null, 2)
+            createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -338,7 +338,5 @@ class ScannerTest {
         Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
 
     }
-
-    private fun createScannerWithSource(source: String) = Scanner(source.trimIndent(), errorReporter)
 
 }
