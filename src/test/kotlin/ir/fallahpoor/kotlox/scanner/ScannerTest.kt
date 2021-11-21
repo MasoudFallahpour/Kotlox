@@ -34,6 +34,27 @@ class ScannerTest {
     }
 
     @Test
+    fun testWhitespace() {
+
+        // Given
+        scanner = createScannerWithSource(
+            """
+                     
+            """
+        )
+
+        // When
+        val actualTokens = scanner.scanTokens()
+
+        // Then
+        val expectedTokens = listOf(
+            Token(TokenType.EOF, "", null, 1)
+        )
+        Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+
+    }
+
+    @Test
     fun testLineComment() {
 
         // Given
