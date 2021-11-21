@@ -27,12 +27,12 @@ class ScannerTest {
     }
 
     @Test
-    fun testComment() {
+    fun testLineComment() {
 
         // Given
         scanner = createScannerWithSource(
             """
-                // This is a comment and placing some token like 'var a = 12' should not produce any token
+                // This is a comment and placing some token likes 'var a = 12' should not produce any token
                 """
         )
 
@@ -42,6 +42,35 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(
             Token(TokenType.EOF, "", null, 1)
+        )
+        Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+
+    }
+
+    @Test
+    fun testBlockComment() {
+
+        // Given
+        scanner = createScannerWithSource(
+            """
+                for
+                /* 
+                 This is a block comment / and * // placing some tokens like 'var a = 12'
+                 should not produce any token
+                */
+                /* another block comment */
+                123
+                """
+        )
+
+        // When
+        val actualTokens = scanner.scanTokens()
+
+        // Then
+        val expectedTokens = listOf(
+            Token(TokenType.FOR, "for", null, 1),
+            Token(TokenType.NUMBER, "123", 123.0, 7),
+            Token(TokenType.EOF, "", null, 7)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 

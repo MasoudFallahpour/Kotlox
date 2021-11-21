@@ -44,10 +44,10 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             Chars.LESS -> addToken(if (nextCharMatches(Chars.EQUAL)) TokenType.LESS_EQUAL else TokenType.LESS)
             Chars.GREATER -> addToken(if (nextCharMatches(Chars.EQUAL)) TokenType.GREATER_EQUAL else TokenType.GREATER)
             Chars.SLASH -> {
-                if (nextCharMatches(Chars.SLASH)) {
-                    comment()
-                } else {
-                    addToken(TokenType.SLASH)
+                when {
+                    nextCharMatches(Chars.SLASH) -> lineComment()
+                    nextCharMatches(Chars.STAR) -> blockComment()
+                    else -> addToken(TokenType.SLASH)
                 }
             }
             Chars.SPACE, Chars.RETURN, Chars.TAB -> {
@@ -98,11 +98,32 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             source[currentCharIndex + 1]
         }
 
-    private fun comment() {
+    private fun lineComment() {
         // A comment goes until the end of the line.
         while (peekNextChar() != Chars.NEW_LINE && !isAtEnd()) {
             getNextChar()
         }
+    }
+
+    private fun blockComment() {
+
+        var blockCommentConsumed = false
+
+        while (!blockCommentConsumed && !isAtEnd()) {
+            if (peekNextChar() == Chars.NEW_LINE) {
+                line++
+                getNextChar()
+            } else if (getNextChar() == Chars.STAR) {
+                if (getNextChar() == Chars.SLASH) {
+                    blockCommentConsumed = true
+                }
+            }
+        }
+
+        if (!blockCommentConsumed) {
+            errorReporter.error(line, "Unterminated block comment.")
+        }
+
     }
 
     private fun string() {
