@@ -174,7 +174,7 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(
             Token(TokenType.STRING, "\"This is a string\"", "This is a string", 1),
-            Token(TokenType.STRING, "\"This is a multi-line\nstring\"", "This is a multi-line\nstring", 3),
+            Token(TokenType.STRING, "\"This is a multi-line\nstring\"", "This is a multi-line\nstring", 2),
             createEofToken(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -328,6 +328,7 @@ class ScannerTest {
         scanner = createScannerWithSource(
             """
                 /* this is an unterminated block comment
+                   here we are on the next line
                 """
         )
 
@@ -335,7 +336,7 @@ class ScannerTest {
         scanner.scanTokens()
 
         // Then
-        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
+        Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
 
     }
 

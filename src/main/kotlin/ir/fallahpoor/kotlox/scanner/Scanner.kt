@@ -128,9 +128,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     private fun string() {
 
+        var startLine = line
+
         while (peekNextChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
             if (peekNextChar() == Chars.NEW_LINE) {
-                line++
+                startLine++
             }
             getNextChar()
         }
@@ -148,6 +150,8 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         val literal = source.substring(lexemeStartIndex + 1, currentCharIndex - 1)
 
         addToken(TokenType.STRING, literal)
+
+        line = startLine
 
     }
 
