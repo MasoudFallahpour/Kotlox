@@ -14,7 +14,7 @@ class ScannerTest {
     private lateinit var scanner: Scanner
 
     @Mock
-    private val errorReporter = ErrorReporter()
+    private lateinit var errorReporter: ErrorReporter
 
     @Test
     fun emptySource() {
