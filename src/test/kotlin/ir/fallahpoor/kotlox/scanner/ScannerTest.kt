@@ -3,10 +3,17 @@ package ir.fallahpoor.kotlox.scanner
 import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.ErrorReporter
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.MockitoJUnitRunner
 
+@RunWith(MockitoJUnitRunner::class)
 class ScannerTest {
 
     private lateinit var scanner: Scanner
+
+    @Mock
     private val errorReporter = ErrorReporter()
 
     @Test
@@ -254,6 +261,60 @@ class ScannerTest {
             Token(TokenType.EOF, "", null, 2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+
+    }
+
+    @Test
+    fun testUnexpectedCharError() {
+
+        // Given
+        scanner = createScannerWithSource(
+            """
+                $
+                """
+        )
+
+        // When
+        scanner.scanTokens()
+
+        // Then
+        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNEXPECTED_CHAR)
+
+    }
+
+    @Test
+    fun testUnterminatedStringError() {
+
+        // Given
+        scanner = createScannerWithSource(
+            """
+                "abc
+                """
+        )
+
+        // When
+        scanner.scanTokens()
+
+        // Then
+        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNTERMINATED_STRING)
+
+    }
+
+    @Test
+    fun testUnterminatedBlockCommentError() {
+
+        // Given
+        scanner = createScannerWithSource(
+            """
+                /* this is an unterminated block comment
+                """
+        )
+
+        // When
+        scanner.scanTokens()
+
+        // Then
+        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
 
     }
 
