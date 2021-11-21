@@ -33,6 +33,7 @@ class ScannerTest {
         scanner = createScannerWithSource(
             """
                 // This is a comment and placing some token likes 'var a = 12' should not produce any token
+                true
                 """
         )
 
@@ -41,7 +42,8 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.EOF, "", null, 1)
+            Token(TokenType.TRUE, "true", null, 2),
+            Token(TokenType.EOF, "", null, 2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
 
@@ -138,8 +140,6 @@ class ScannerTest {
             """
         )
 
-        //
-
         // When
         val actualTokens = scanner.scanTokens()
 
@@ -154,12 +154,13 @@ class ScannerTest {
     }
 
     @Test
-    fun testLessThanOrEqual() {
+    fun testSingleCharTokens() {
 
         // Given
         scanner = createScannerWithSource(
             """
-                <<===
+                (){},
+                .+-;*/
                 """
         )
 
@@ -168,9 +169,46 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.LESS, "<", null, 1),
-            Token(TokenType.LESS_EQUAL, "<=", null, 1),
+            Token(TokenType.LEFT_PAREN, "(", null, 1),
+            Token(TokenType.RIGHT_PAREN, ")", null, 1),
+            Token(TokenType.LEFT_BRACE, "{", null, 1),
+            Token(TokenType.RIGHT_BRACE, "}", null, 1),
+            Token(TokenType.COMMA, ",", null, 1),
+            Token(TokenType.DOT, ".", null, 2),
+            Token(TokenType.PLUS, "+", null, 2),
+            Token(TokenType.MINUS, "-", null, 2),
+            Token(TokenType.SEMICOLON, ";", null, 2),
+            Token(TokenType.STAR, "*", null, 2),
+            Token(TokenType.SLASH, "/", null, 2),
+            Token(TokenType.EOF, "", null, 2)
+        )
+        Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+
+    }
+
+    @Test
+    fun testOneOrTwoCharTokens() {
+
+        // Given
+        scanner = createScannerWithSource(
+            """
+                !=! ===>>=<=< 
+                """
+        )
+
+        // When
+        val actualTokens = scanner.scanTokens()
+
+        // Then
+        val expectedTokens = listOf(
+            Token(TokenType.BANG_EQUAL, "!=", null, 1),
+            Token(TokenType.BANG, "!", null, 1),
             Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+            Token(TokenType.EQUAL, "=", null, 1),
+            Token(TokenType.GREATER, ">", null, 1),
+            Token(TokenType.GREATER_EQUAL, ">=", null, 1),
+            Token(TokenType.LESS_EQUAL, "<=", null, 1),
+            Token(TokenType.LESS, "<", null, 1),
             Token(TokenType.EOF, "", null, 1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
