@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.31"
+    id("org.jetbrains.kotlinx.kover") version "0.4.2"
     application
 }
 
@@ -22,6 +23,10 @@ dependencies {
 
 tasks.test {
     useJUnit()
+}
+
+tasks.koverXmlReport {
+    isEnabled = false
 }
 
 tasks.withType<KotlinCompile> {
