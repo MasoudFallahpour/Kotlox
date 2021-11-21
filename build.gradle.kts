@@ -34,7 +34,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("LoxKt")
 }
 
 val compileKotlin: KotlinCompile by tasks

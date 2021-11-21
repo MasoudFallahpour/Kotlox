@@ -66,3 +66,7 @@ class Lox(private val commandLineArgs: Array<String>) {
     }
 
 }
+
+fun main(args: Array<String>) {
+    Lox(args).run()
+}
