@@ -25,9 +25,8 @@ Chapter 5: Representing Code (I'm here!)
 Unit Tests
 -
 
-One major difference of Kotlox compared with most other implementations is that I've written a lot of tests to verify
-the correctness of the implementation. You can find all the unit
-tests [here](https://github.com/MasoodFallahpoor/KotLox/tree/master/src/test/kotlin/ir/fallahpoor/kotlox).
+I've written lots of unit tests to verify the correctness of the implementation. They're all
+[here](https://github.com/MasoodFallahpoor/KotLox/tree/master/src/test/kotlin/ir/fallahpoor/kotlox).
 
 
 
