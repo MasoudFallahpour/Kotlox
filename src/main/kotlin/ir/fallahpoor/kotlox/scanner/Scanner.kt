@@ -57,7 +57,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             Chars.DOUBLE_QUOTES -> string()
             in Chars.DIGITS -> number()
             in Chars.ALPHA_LOWER_CASE, in Chars.ALPHA_UPPER_CASE, Chars.UNDERSCORE -> identifier()
-            else -> errorReporter.error(line, "Unexpected character.")
+            else -> errorReporter.error(line, ErrorReporter.Error.UNEXPECTED_CHAR)
         }
     }
 
@@ -121,7 +121,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         if (!blockCommentConsumed) {
-            errorReporter.error(line, "Unterminated block comment.")
+            errorReporter.error(line, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
         }
 
     }
@@ -136,7 +136,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         if (isAtEnd()) {
-            errorReporter.error(line, "Unterminated string.")
+            errorReporter.error(line, ErrorReporter.Error.UNTERMINATED_STRING)
             return
         }
 
