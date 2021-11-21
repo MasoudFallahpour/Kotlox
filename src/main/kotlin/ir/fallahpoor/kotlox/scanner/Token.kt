@@ -17,11 +17,11 @@ data class Token(
         } else {
             ""
         }
-        return "<" +
+        return "$" +
                 "line = $line, " +
                 "type = $type" +
                 lex +
                 lit +
-                ">"
+                "$"
     }
 }
