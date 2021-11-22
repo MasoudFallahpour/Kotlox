@@ -18,9 +18,11 @@ Chapter 2: A Map of the Territory (done)
 
 Chapter 3: The Lox Language (done)
 
-Chapter 4: Scanning (done - including all challenges)
+Chapter 4: Scanning (done)
 
-Chapter 5: Representing Code (I'm here!)
+Chapter 5: Representing Code (done)
+
+Chapter 6: Parsing Expressions (I'm here!)
 
 Unit Tests
 -
