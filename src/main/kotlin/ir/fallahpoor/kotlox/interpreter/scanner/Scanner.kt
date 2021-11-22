@@ -1,6 +1,6 @@
-package ir.fallahpoor.kotlox.scanner
+package ir.fallahpoor.kotlox.interpreter.scanner
 
-import ir.fallahpoor.kotlox.ErrorReporter
+import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 
 class Scanner(private val source: String, private val errorReporter: ErrorReporter) {
 

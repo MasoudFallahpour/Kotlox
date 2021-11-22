@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox
+package ir.fallahpoor.kotlox.interpreter
 
 class ErrorReporter {
 

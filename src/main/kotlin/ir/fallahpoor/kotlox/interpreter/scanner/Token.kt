@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox.scanner
+package ir.fallahpoor.kotlox.interpreter.scanner
 
 data class Token(
     val type: TokenType,

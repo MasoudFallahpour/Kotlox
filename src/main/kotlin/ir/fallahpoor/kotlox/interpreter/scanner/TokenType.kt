@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox.scanner
+package ir.fallahpoor.kotlox.interpreter.scanner
 
 enum class TokenType {
     // Single-character tokens

@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox.scanner
+package ir.fallahpoor.kotlox.interpreter.scanner
 
 object Chars {
     const val NEW_LINE = '\n'

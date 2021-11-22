@@ -1,7 +1,11 @@
 package ir.fallahpoor.kotlox.scanner
 
 import com.google.common.truth.Truth
-import ir.fallahpoor.kotlox.ErrorReporter
+import ir.fallahpoor.kotlox.interpreter.ErrorReporter
+import ir.fallahpoor.kotlox.interpreter.scanner.Keywords
+import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
+import ir.fallahpoor.kotlox.interpreter.scanner.Token
+import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock

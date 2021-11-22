@@ -1,7 +1,7 @@
-package ir.fallahpoor.kotlox
+package ir.fallahpoor.kotlox.interpreter
 
-import ir.fallahpoor.kotlox.scanner.Scanner
-import ir.fallahpoor.kotlox.scanner.Token
+import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
+import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
