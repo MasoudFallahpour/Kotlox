@@ -303,7 +303,7 @@ class ScannerTest {
         scanner.scanTokens()
 
         // Then
-        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNEXPECTED_CHAR)
+        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnexpectedChar('$'))
 
     }
 
@@ -321,7 +321,7 @@ class ScannerTest {
         scanner.scanTokens()
 
         // Then
-        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UNTERMINATED_STRING)
+        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnterminatedString)
 
     }
 
@@ -340,7 +340,7 @@ class ScannerTest {
         scanner.scanTokens()
 
         // Then
-        Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
+        Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UnterminatedBlockComment)
 
     }
 

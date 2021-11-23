@@ -5,10 +5,10 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
 class ErrorReporter {
 
-    enum class Error(val message: String) {
-        UNEXPECTED_CHAR("Unexpected character."),
-        UNTERMINATED_BLOCK_COMMENT("Unterminated block comment."),
-        UNTERMINATED_STRING("Unterminated string.")
+    sealed class Error(val message: String) {
+        data class UnexpectedChar(private val char: Char) : Error("Unexpected char '$char'")
+        object UnterminatedBlockComment : Error("Unterminated block comment")
+        object UnterminatedString : Error("Unterminated string")
     }
 
     var hadError = false

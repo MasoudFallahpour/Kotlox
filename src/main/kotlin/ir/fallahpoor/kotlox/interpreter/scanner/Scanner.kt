@@ -28,7 +28,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     private fun isAtEnd() = currentCharIndex >= source.length
 
     private fun scanToken() {
-        when (getNextChar()) {
+        when (val char = getNextChar()) {
             Chars.LEFT_PAREN -> addToken(TokenType.LEFT_PAREN)
             Chars.RIGHT_PAREN -> addToken(TokenType.RIGHT_PAREN)
             Chars.LEFt_BRACE -> addToken(TokenType.LEFT_BRACE)
@@ -57,7 +57,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             Chars.DOUBLE_QUOTES -> string()
             in Chars.DIGITS -> number()
             in Chars.ALPHA_LOWER_CASE, in Chars.ALPHA_UPPER_CASE, Chars.UNDERSCORE -> identifier()
-            else -> errorReporter.error(line, ErrorReporter.Error.UNEXPECTED_CHAR)
+            else -> errorReporter.error(line, ErrorReporter.Error.UnexpectedChar(char))
         }
     }
 
@@ -121,7 +121,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         if (!blockCommentConsumed) {
-            errorReporter.error(line, ErrorReporter.Error.UNTERMINATED_BLOCK_COMMENT)
+            errorReporter.error(line, ErrorReporter.Error.UnterminatedBlockComment)
         }
 
     }
@@ -138,7 +138,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         if (isAtEnd()) {
-            errorReporter.error(line, ErrorReporter.Error.UNTERMINATED_STRING)
+            errorReporter.error(line, ErrorReporter.Error.UnterminatedString)
             return
         }
 
