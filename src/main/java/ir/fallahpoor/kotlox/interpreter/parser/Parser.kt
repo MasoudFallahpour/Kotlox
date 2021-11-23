@@ -89,26 +89,22 @@ class Parser(
             primary()
         }
 
-    private fun primary(): Expr {
+    private fun primary(): Expr =
         if (tokens.getNextTokenIfItHasType(TokenType.FALSE)) {
-            return Expr.Literal(false)
-        }
-        if (tokens.getNextTokenIfItHasType(TokenType.TRUE)) {
-            return Expr.Literal(true)
-        }
-        if (tokens.getNextTokenIfItHasType(TokenType.NIL)) {
-            return Expr.Literal(null)
-        }
-        if (tokens.getNextTokenIfItHasType(TokenType.NUMBER, TokenType.STRING)) {
-            return Expr.Literal(tokens.getPreviousToken().literal)
-        }
-        if (tokens.getNextTokenIfItHasType(TokenType.LEFT_PAREN)) {
+            Expr.Literal(false)
+        } else if (tokens.getNextTokenIfItHasType(TokenType.TRUE)) {
+            Expr.Literal(true)
+        } else if (tokens.getNextTokenIfItHasType(TokenType.NIL)) {
+            Expr.Literal(null)
+        } else if (tokens.getNextTokenIfItHasType(TokenType.NUMBER, TokenType.STRING)) {
+            Expr.Literal(tokens.getPreviousToken().literal)
+        } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_PAREN)) {
             val expr = expression()
             consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return Expr.Grouping(expr)
+            Expr.Grouping(expr)
+        } else {
+            throw error(tokens.peekNextToken(), "Expect expression.")
         }
-        throw error(tokens.peekNextToken(), "Expect expression.")
-    }
 
     // Checks to see if the next token is of the expected type. If so, it consumes the token.
     // Otherwise, we report an error.

@@ -1,7 +1,6 @@
 package ir.fallahpoor.kotlox.interpreter
 
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
-import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
 sealed class Expr {
 
@@ -12,7 +11,7 @@ sealed class Expr {
         fun visitUnaryExpr(expr: Unary): R
     }
 
-    class Binary(
+    data class Binary(
         val left: Expr,
         val operator: Token,
         val right: Expr
@@ -22,7 +21,7 @@ sealed class Expr {
         }
     }
 
-    class Grouping(
+    data class Grouping(
         val expression: Expr
     ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
@@ -30,7 +29,7 @@ sealed class Expr {
         }
     }
 
-    class Literal(
+    data class Literal(
         val value: Any?
     ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
@@ -38,7 +37,7 @@ sealed class Expr {
         }
     }
 
-    class Unary(
+    data class Unary(
         val operator: Token,
         val right: Expr
     ) : Expr() {
