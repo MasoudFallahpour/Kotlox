@@ -36,6 +36,7 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(createEofToken(1))
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -55,6 +56,7 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(createEofToken(1))
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -78,6 +80,7 @@ class ScannerTest {
             createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -107,6 +110,7 @@ class ScannerTest {
             createEofToken(7)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -131,6 +135,7 @@ class ScannerTest {
             createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -157,6 +162,7 @@ class ScannerTest {
             createEofToken(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -182,6 +188,7 @@ class ScannerTest {
             createEofToken(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -215,6 +222,7 @@ class ScannerTest {
             createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -244,6 +252,7 @@ class ScannerTest {
             createEofToken(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -286,6 +295,7 @@ class ScannerTest {
             createEofToken(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -304,7 +314,7 @@ class ScannerTest {
 
         // Then
         Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnexpectedChar('$'))
-
+        Mockito.verifyNoMoreInteractions(errorReporter)
     }
 
     @Test
@@ -322,6 +332,7 @@ class ScannerTest {
 
         // Then
         Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnterminatedString)
+        Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
 
@@ -341,6 +352,7 @@ class ScannerTest {
 
         // Then
         Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
 
