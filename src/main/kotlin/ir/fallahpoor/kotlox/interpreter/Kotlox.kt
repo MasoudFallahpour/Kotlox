@@ -1,5 +1,7 @@
 package ir.fallahpoor.kotlox.interpreter
 
+import ir.fallahpoor.kotlox.interpreter.parser.Parser
+import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import java.io.BufferedReader
@@ -59,9 +61,15 @@ class Lox(private val commandLineArgs: Array<String>) {
     private fun run(source: String) {
         val scanner = Scanner(source, errorReporter)
         val tokens: List<Token> = scanner.scanTokens()
-        // For now, just print the tokens.
-        for (token in tokens) {
-            println(token)
+        val parser = Parser(Tokens(tokens), errorReporter)
+        val expression: Expr? = parser.parse()
+        if (expression != null) {
+            println(AstPrinter().print(expression))
+        } else {
+            // Stop if there was a syntax error.
+            if (errorReporter.hadError) {
+                return
+            }
         }
     }
 
