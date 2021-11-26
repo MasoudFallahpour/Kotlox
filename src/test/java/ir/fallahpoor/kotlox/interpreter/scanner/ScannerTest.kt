@@ -1,11 +1,7 @@
-package ir.fallahpoor.kotlox.scanner
+package ir.fallahpoor.kotlox.interpreter.scanner
 
 import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
-import ir.fallahpoor.kotlox.interpreter.scanner.Keywords
-import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
-import ir.fallahpoor.kotlox.interpreter.scanner.Token
-import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -46,7 +42,7 @@ class ScannerTest {
         // Given
         scanner = createScannerWithSource(
             """
-                     
+
             """
         )
 
@@ -91,7 +87,7 @@ class ScannerTest {
         scanner = createScannerWithSource(
             """
                 for
-                /* 
+                /*
                  This is a block comment / and * // placing some tokens like 'var a = 12'
                  should not produce any token
                 */
@@ -232,7 +228,7 @@ class ScannerTest {
         // Given
         scanner = createScannerWithSource(
             """
-                !=! ===>>=<=< 
+                !=! ===>>=<=<
                 """
         )
 
