@@ -70,7 +70,7 @@ private fun defineVisitor(writer: PrintWriter, baseName: String, types: List<Str
     for (type: String in types) {
         val typeName = type.split("->")[0].trim()
         writer.println(
-            "${DOUBLE_INDENT}fun visit$typeName$baseName(${baseName.toLowerCase()}: $typeName): R"
+            "${DOUBLE_INDENT}fun visit$typeName$baseName(${baseName.lowercase()}: $typeName): R"
         )
     }
     writer.println("${SINGLE_INDENT}}")
