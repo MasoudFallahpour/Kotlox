@@ -202,6 +202,42 @@ class ParserTest {
 
     }
 
+    @Test
+    fun test10() {
+
+        // Given
+        val source = "(1,2,3) == 3"
+        scanner = createScannerWithSource(source)
+        val tokens: List<Token> = scanner.scanTokens()
+        parser = createParser(tokens)
+
+        // When
+        val actualExpr: Expr? = parser.parse()
+
+        // Then
+        val expectedExpr: Expr? = getExpectedExpr(source)
+        Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
+
+    }
+
+    @Test
+    fun test11() {
+
+        // Given
+        val source = "1, 2, 3, (4 + 5) / 6 <= 8 == 8"
+        scanner = createScannerWithSource(source)
+        val tokens: List<Token> = scanner.scanTokens()
+        parser = createParser(tokens)
+
+        // When
+        val actualExpr: Expr? = parser.parse()
+
+        // Then
+        val expectedExpr: Expr? = getExpectedExpr(source)
+        Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
+
+    }
+
     private fun createScannerWithSource(source: String) = Scanner(source.trimIndent(), errorReporter)
 
     private fun createParser(tokens: List<Token>) = Parser(Tokens(tokens), errorReporter)

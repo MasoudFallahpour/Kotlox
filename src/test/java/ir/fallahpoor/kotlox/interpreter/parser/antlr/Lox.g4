@@ -2,7 +2,8 @@ grammar Lox;
 
 // Currenly STRING is missing from the 'primary' rule
 
-expression: equality;
+expression:
+    equality (op+=',' equality)* ;
 
 equality:
     comparison (op+=('!=' | '==') comparison)* ;

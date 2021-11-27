@@ -10,7 +10,7 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * unambiguous and has no left-recursive rules. Otherwise, it would not be possible to implement
  * such a parser.
  *
- * expression → equality;
+ * expression → equality ("," equality)*;
  * equality   → comparison ( ( "!=" | "==" ) comparison )*;
  * comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
  * term       → factor ( ( "-" | "+" ) factor )*;
@@ -32,7 +32,15 @@ class Parser(
             null
         }
 
-    private fun expression(): Expr = equality()
+    private fun expression(): Expr {
+        var expr: Expr = equality()
+        while (tokens.getNextTokenIfItHasType(TokenType.COMMA)) {
+            val operator: Token = tokens.getPreviousToken()
+            val right: Expr = equality()
+            expr = Expr.Binary(expr, operator, right)
+        }
+        return expr
+    }
 
     private fun equality(): Expr {
         var expr: Expr = comparison()

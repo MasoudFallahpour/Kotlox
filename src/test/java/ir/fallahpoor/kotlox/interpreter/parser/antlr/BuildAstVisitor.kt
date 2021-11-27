@@ -10,7 +10,26 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
 class BuildAstVisitor : LoxBaseVisitor<Expr>() {
 
-    override fun visitExpression(ctx: LoxParser.ExpressionContext): Expr = visit(ctx.equality())
+    override fun visitExpression(ctx: LoxParser.ExpressionContext): Expr {
+        var expr: Expr = visitEquality(ctx.equality(0))
+        for (i in 0..ctx.op.lastIndex) {
+            expr = createEqualityExpr(
+                currentExpr = expr,
+                equalityContext = ctx.equality(i + 1)
+            )
+        }
+        return expr
+    }
+
+    private fun createEqualityExpr(
+        currentExpr: Expr,
+        equalityContext: LoxParser.EqualityContext
+    ): Expr =
+        Expr.Binary(
+            left = currentExpr,
+            operator = Token(TokenType.COMMA, ",", null, 1),
+            right = visitEquality(equalityContext)
+        )
 
     override fun visitEquality(ctx: LoxParser.EqualityContext): Expr {
         var expr: Expr = visitComparison(ctx.comparison(0))
