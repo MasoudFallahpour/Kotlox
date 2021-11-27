@@ -46,7 +46,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -65,7 +65,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -84,7 +84,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -103,7 +103,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -122,7 +122,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -141,7 +141,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -160,7 +160,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -179,7 +179,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
-        Mockito.verifyNoMoreInteractions(errorReporter)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -217,6 +217,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
@@ -235,6 +236,7 @@ class ParserTest {
         // Then
         val expectedExpr: Expr? = getExpectedExpr(source)
         Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
+        Mockito.verifyNoInteractions(errorReporter)
 
     }
 
