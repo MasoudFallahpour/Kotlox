@@ -22,7 +22,9 @@ Chapter 4: Scanning (done)
 
 Chapter 5: Representing Code (done)
 
-Chapter 6: Parsing Expressions (I'm here!)
+Chapter 6: Parsing Expressions (done)
+
+Chapter 7: Evaluating Expressions (I'm here!)
 
 Unit Tests
 -
