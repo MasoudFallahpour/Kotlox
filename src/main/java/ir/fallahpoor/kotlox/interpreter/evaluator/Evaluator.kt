@@ -10,6 +10,7 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
     companion object {
         private const val ERROR_MESSAGE_UNSUPPORTED_OPERAND_TYPE = "Operands must be two numbers or two strings."
         private const val ERROR_MESSAGE_OPERAND_MUST_BE_A_NUMBER = "Operand must be a number."
+        private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
 
     fun evaluate(expression: Expr) {
@@ -43,31 +44,36 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
         return when (expr.operator.type) {
             TokenType.COMMA -> right
             TokenType.GREATER -> {
-                checkNumberOperands(expr.operator, left, right)
+                checkOperandsAreNumber(expr.operator, left, right)
                 (left as Double) > (right as Double)
             }
             TokenType.GREATER_EQUAL -> {
-                checkNumberOperands(expr.operator, left, right)
+                checkOperandsAreNumber(expr.operator, left, right)
                 (left as Double) >= (right as Double)
             }
             TokenType.LESS -> {
-                checkNumberOperands(expr.operator, left, right)
+                checkOperandsAreNumber(expr.operator, left, right)
                 (left as Double) < (right as Double)
             }
             TokenType.LESS_EQUAL -> {
-                checkNumberOperands(expr.operator, left, right)
+                checkOperandsAreNumber(expr.operator, left, right)
                 (left as Double) <= (right as Double)
             }
             TokenType.MINUS -> {
-                checkNumberOperands(expr.operator, left, right)
+                checkOperandsAreNumber(expr.operator, left, right)
                 (left as Double) - (right as Double)
             }
             TokenType.SLASH -> {
-                checkNumberOperands(expr.operator, left, right)
-                (left as Double) / (right as Double)
+                checkOperandsAreNumber(expr.operator, left, right)
+                val rightAsDouble = (right as Double)
+                if (rightAsDouble == 0.0) {
+                    throw RuntimeError(expr.operator, ERROR_MESSAGE_DIVISION_BY_ZERO)
+                } else {
+                    (left as Double) / rightAsDouble
+                }
             }
             TokenType.STAR -> {
-                checkNumberOperands(expr.operator, left, right)
+                checkOperandsAreNumber(expr.operator, left, right)
                 (left as Double) * (right as Double)
             }
             TokenType.PLUS -> {
@@ -86,7 +92,7 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
 
     }
 
-    private fun checkNumberOperands(operator: Token, left: Any?, right: Any?) {
+    private fun checkOperandsAreNumber(operator: Token, left: Any?, right: Any?) {
         if (left !is Double || right !is Double) {
             throw RuntimeError(operator, ERROR_MESSAGE_OPERAND_MUST_BE_A_NUMBER)
         }
