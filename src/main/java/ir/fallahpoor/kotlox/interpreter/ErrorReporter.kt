@@ -1,5 +1,6 @@
 package ir.fallahpoor.kotlox.interpreter
 
+import ir.fallahpoor.kotlox.interpreter.evaluator.RuntimeError
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
@@ -12,6 +13,12 @@ class ErrorReporter {
     }
 
     var hadError = false
+    var hadRuntimeError = false
+
+    fun runtimeError(error: RuntimeError) {
+        System.err.println("[line " + error.token.line + "] " + error.message)
+        hadRuntimeError = true
+    }
 
     fun error(line: Int, error: Error) {
         report(line, "", error.message)

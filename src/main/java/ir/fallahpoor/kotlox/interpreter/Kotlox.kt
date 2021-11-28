@@ -1,5 +1,6 @@
 package ir.fallahpoor.kotlox.interpreter
 
+import ir.fallahpoor.kotlox.interpreter.evaluator.Evaluator
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
@@ -14,13 +15,17 @@ import kotlin.system.exitProcess
 class Lox(private val commandLineArgs: Array<String>) {
 
     private val errorReporter = ErrorReporter()
+    private val evaluator = Evaluator(errorReporter)
 
     private object ErrorCode {
         // Lox is used with an incorrect number of arguments
         const val WRONG_USAGE = 64
 
-        // There is a syntax error in some way.
+        // There is a syntax error in some way
         const val WRONG_SYNTAX = 65
+
+        // There an internal error like adding a number to a string
+        const val RUNTIME_ERROR = 70
     }
 
     fun run() {
@@ -45,6 +50,7 @@ class Lox(private val commandLineArgs: Array<String>) {
             val line = reader.readLine() ?: break
             run(line)
             errorReporter.hadError = false
+            errorReporter.hadRuntimeError = false
         }
     }
 
@@ -55,6 +61,9 @@ class Lox(private val commandLineArgs: Array<String>) {
         if (errorReporter.hadError) {
             exitProcess(ErrorCode.WRONG_SYNTAX)
         }
+        if (errorReporter.hadRuntimeError) {
+            exitProcess(ErrorCode.RUNTIME_ERROR)
+        }
     }
 
     private fun run(source: String) {
@@ -62,13 +71,16 @@ class Lox(private val commandLineArgs: Array<String>) {
         val tokens: List<Token> = scanner.scanTokens()
         val parser = Parser(Tokens(tokens), errorReporter)
         val expression: Expr? = parser.parse()
-        if (expression != null) {
-            println(AstPrinter().print(expression))
-        } else {
-            // Stop if there was a syntax error.
-            if (errorReporter.hadError) {
-                return
-            }
+        // Stop if there was a syntax error.
+        if (errorReporter.hadError) {
+            println()
+            return
+        }
+        expression?.let {
+            evaluator.evaluate(it)
+        }
+        if (errorReporter.hadRuntimeError) {
+            println()
         }
     }
 
