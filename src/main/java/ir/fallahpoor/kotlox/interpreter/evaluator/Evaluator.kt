@@ -8,7 +8,7 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
 
     companion object {
-        private const val ERROR_MESSAGE_UNSUPPORTED_OPERAND_TYPE = "Operands must be two numbers or two strings."
+        private const val ERROR_MESSAGE_INCOMPATIBLE_TYPES = "Operands are incompatible."
         private const val ERROR_MESSAGE_OPERAND_MUST_BE_A_NUMBER = "Operand must be a number."
         private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
@@ -81,8 +81,20 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
                     left + right
                 } else if (left is String && right is String) {
                     left + right
+                } else if (left is Double && right is String) {
+                    if (checkNumberIsWhole(left)) {
+                        left.toInt().toString() + right
+                    } else {
+                        throw RuntimeError(expr.operator, ERROR_MESSAGE_INCOMPATIBLE_TYPES)
+                    }
+                } else if (left is String && right is Double) {
+                    if (checkNumberIsWhole(right)) {
+                        left + right.toInt().toString()
+                    } else {
+                        throw RuntimeError(expr.operator, ERROR_MESSAGE_INCOMPATIBLE_TYPES)
+                    }
                 } else {
-                    throw RuntimeError(expr.operator, ERROR_MESSAGE_UNSUPPORTED_OPERAND_TYPE)
+                    throw RuntimeError(expr.operator, ERROR_MESSAGE_INCOMPATIBLE_TYPES)
                 }
             }
             TokenType.BANG_EQUAL -> !isEqual(left, right)
@@ -91,6 +103,9 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
         }
 
     }
+
+    private fun checkNumberIsWhole(number: Double): Boolean =
+        number.toString().endsWith(".0")
 
     private fun checkOperandsAreNumber(operator: Token, left: Any?, right: Any?) {
         if (left !is Double || right !is Double) {
