@@ -25,7 +25,9 @@ Chapter 5: Representing Code (done)
 
 Chapter 6: Parsing Expressions (done)
 
-Chapter 7: Evaluating Expressions (I'm here!)
+Chapter 7: Evaluating Expressions (done)
+
+Chapter 8: Statements and State (I'm here!)
 
 Unit Tests
 -
