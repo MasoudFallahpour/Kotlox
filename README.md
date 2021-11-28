@@ -1,5 +1,6 @@
 Kotlox (WIP)
 =======
+![Build status](https://github.com/masoodfallahpoor/Kotlox/actions/workflows/build.yml/badge.svg?branch=master)
 
 Kotlox is an interpreter for the [Lox programming language](https://craftinginterpreters.com/the-lox-language.html),
 written in Kotlin/JVM.
