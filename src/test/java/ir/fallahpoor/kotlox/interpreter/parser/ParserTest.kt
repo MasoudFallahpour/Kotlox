@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream
 @RunWith(MockitoJUnitRunner::class)
 class ParserTest {
 
-    private lateinit var scanner: Scanner
     private lateinit var parser: Parser
 
     @Mock
@@ -36,9 +35,7 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * (4 - 5)"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -55,9 +52,7 @@ class ParserTest {
 
         // Given
         val source = "1 / 2 * 3"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -74,9 +69,7 @@ class ParserTest {
 
         // Given
         val source = "1 != 3 == 4"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -93,9 +86,7 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * -4 - 6"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -112,9 +103,7 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * -4 - 6 >= (7 - 8) * 9"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -131,9 +120,7 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * -4 - 6 >= (7 - 8) * 9 == !(10.12 <= 13)"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -150,9 +137,7 @@ class ParserTest {
 
         // Given
         val source = "!true == false"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -169,9 +154,7 @@ class ParserTest {
 
         // Given
         val source = "12 <= -10 * (3 + 10) < 12"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -188,9 +171,7 @@ class ParserTest {
 
         // Given
         val source = "(1"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -207,9 +188,7 @@ class ParserTest {
 
         // Given
         val source = "(1,2,3) == 3"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -226,9 +205,7 @@ class ParserTest {
 
         // Given
         val source = "1, 2, 3, (4 + 5) / 6 <= 8 == 8"
-        scanner = createScannerWithSource(source)
-        val tokens: List<Token> = scanner.scanTokens()
-        parser = createParser(tokens)
+        parser = createParser(source)
 
         // When
         val actualExpr: Expr? = parser.parse()
@@ -240,9 +217,11 @@ class ParserTest {
 
     }
 
-    private fun createScannerWithSource(source: String) = Scanner(source.trimIndent(), errorReporter)
-
-    private fun createParser(tokens: List<Token>) = Parser(Tokens(tokens), errorReporter)
+    private fun createParser(source: String): Parser {
+        val scanner = Scanner(source.trimIndent(), errorReporter)
+        val tokens: List<Token> = scanner.scanTokens()
+        return Parser(Tokens(tokens), errorReporter)
+    }
 
     private fun getExpectedExpr(source: String): Expr? {
         val inputStream = CharStreams.fromStream(ByteArrayInputStream(source.toByteArray()))
