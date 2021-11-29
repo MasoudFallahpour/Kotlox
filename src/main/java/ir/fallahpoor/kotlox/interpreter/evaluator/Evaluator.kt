@@ -13,17 +13,17 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
         private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
 
-    fun evaluate(expression: Expr) {
+    fun evaluate(expression: Expr): String? =
         try {
             val value = eval(expression)
-            println(stringify(value))
+            stringify(value)
         } catch (error: RuntimeError) {
             errorReporter.runtimeError(error)
+            null
         }
-    }
 
-    private fun stringify(any: Any?): String {
-        return when (any) {
+    private fun stringify(any: Any?): String =
+        when (any) {
             null -> "nil"
             is Double -> {
                 var text = any.toString()
@@ -34,7 +34,6 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
             }
             else -> any.toString()
         }
-    }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
 
@@ -134,7 +133,7 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
         return when (expr.operator.type) {
             TokenType.BANG -> !isTruthy(right)
             TokenType.MINUS -> {
-                checkNumberOperand(expr.operator, right)
+                checkOperandIsNumber(expr.operator, right)
                 -(right as Double)
             }
             else -> null // Unreachable.
@@ -149,7 +148,7 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
             else -> true
         }
 
-    private fun checkNumberOperand(operator: Token, operand: Any?) {
+    private fun checkOperandIsNumber(operator: Token, operand: Any?) {
         if (operand !is Double) {
             throw RuntimeError(operator, ERROR_MESSAGE_OPERAND_MUST_BE_A_NUMBER)
         }

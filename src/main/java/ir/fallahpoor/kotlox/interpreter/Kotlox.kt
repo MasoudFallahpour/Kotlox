@@ -77,7 +77,10 @@ class Lox(private val commandLineArgs: Array<String>) {
             return
         }
         expression?.let {
-            evaluator.evaluate(it)
+            val result: String? = evaluator.evaluate(it)
+            result?.let {
+                println(result)
+            }
         }
         if (errorReporter.hadRuntimeError) {
             println()
