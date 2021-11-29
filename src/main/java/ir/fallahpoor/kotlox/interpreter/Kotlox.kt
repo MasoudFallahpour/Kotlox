@@ -33,7 +33,7 @@ class Lox(private val commandLineArgs: Array<String>) {
             0 -> runPrompt()
             1 -> runFile(commandLineArgs[0])
             else -> {
-                println("Usage: kotlox [script]")
+                println("Usage: Kotlox [script]")
                 exitProcess(ErrorCode.WRONG_USAGE)
             }
         }

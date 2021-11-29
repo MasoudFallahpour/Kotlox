@@ -7,8 +7,20 @@ written in Kotlin/JVM.
 
 It's not a mere "IntelliJ IDEA -> menu -> code -> Convert Java File to Kotlin File" conversion of the reference
 Java [implementation](https://github.com/munificent/craftinginterpreters/tree/master/java/com/craftinginterpreters/lox)!
-Each line of Kotlox is handcrafted. That's the reason why Kotlox does not exactly match the reference Java
-implementation. I've added some new classes, renamed some others, renamed some variables, etc.
+Each line of Kotlox is handcrafted. That's the reason why the implementation of Kotlox does not match the reference Java
+implementation.
+
+Build
+-
+The easiest way to build Kotlox is to use IntelliJ IDEA. Just import it into the IDE and build it! If you want to use
+Kotlox outside the IDE, then you should create a JAR file.
+
+Usage
+-
+With `Kotlox.jar` available, you can run it in two ways:
+
+- Run Kotlox in REPL mode (`java -jar Kotlox.jar`),
+- Run a script file (`java -jar Kotlox.jar [script_file]`)
 
 Current Progress
 -
@@ -32,7 +44,7 @@ Chapter 8: Statements and State (I'm here!)
 Unit Tests
 -
 
-I've written lots of unit tests to verify the correctness of the implementation. They're all
+There are a lot of unit tests in place to verify the correctness of the implementation. They can be found
 [here](https://github.com/MasoodFallahpoor/Kotlox/tree/master/src/test/java/ir/fallahpoor/kotlox/interpreter).
 
 
