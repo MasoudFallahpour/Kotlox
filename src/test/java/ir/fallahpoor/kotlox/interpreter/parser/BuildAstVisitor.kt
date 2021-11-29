@@ -1,6 +1,9 @@
-package ir.fallahpoor.kotlox.interpreter.antlr
+package ir.fallahpoor.kotlox.interpreter.parser
 
 import ir.fallahpoor.kotlox.interpreter.Expr
+import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
+import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
+import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
