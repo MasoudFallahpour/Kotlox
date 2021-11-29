@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox.interpreter.parser.antlr
+package ir.fallahpoor.kotlox.interpreter.antlr
 
 import ir.fallahpoor.kotlox.interpreter.Expr
 import ir.fallahpoor.kotlox.interpreter.scanner.Token

@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox.interpreter.parser.antlr;
+package ir.fallahpoor.kotlox.interpreter.antlr;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

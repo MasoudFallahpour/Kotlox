@@ -3,9 +3,9 @@ package ir.fallahpoor.kotlox.interpreter.parser
 import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Expr
-import ir.fallahpoor.kotlox.interpreter.parser.antlr.BuildAstVisitor
-import ir.fallahpoor.kotlox.interpreter.parser.antlr.LoxLexer
-import ir.fallahpoor.kotlox.interpreter.parser.antlr.LoxParser
+import ir.fallahpoor.kotlox.interpreter.antlr.BuildAstVisitor
+import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
+import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import org.antlr.v4.runtime.BailErrorStrategy
