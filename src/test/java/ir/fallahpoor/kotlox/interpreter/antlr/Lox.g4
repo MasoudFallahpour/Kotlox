@@ -1,34 +1,34 @@
 grammar Lox;
 
-// Currenly STRING is missing from the 'primary' rule
+expression
+    : equality (op+=',' equality)* ;
 
-expression:
-    equality (op+=',' equality)* ;
+equality
+    : comparison (op+=('!=' | '==') comparison)* ;
 
-equality:
-    comparison (op+=('!=' | '==') comparison)* ;
+comparison
+    : term (op+=( '>' | '>=' | '<' | '<=') term)* ;
 
-comparison:
-    term (op+=( '>' | '>=' | '<' | '<=') term)* ;
+term
+    : factor (op+=('-' | '+') factor)* ;
 
-term:
-    factor (op+=('-' | '+') factor)* ;
+factor
+    : unary (op+=( '/' | '*') unary)* ;
 
-factor:
-    unary (op+=( '/' | '*') unary)* ;
-
-unary:
-    op+=('!' | '-') unary
+unary
+    : op+=('!' | '-') unary
     | primary ;
 
-primary:
-    NUMBER
+primary
+    : NUMBER
+    | STRING
     | 'true'
     | 'false'
     | 'nil'
     | '(' expression ')' ;
 
 NUMBER: [0-9]+ ('.' [0-9]+)? ;
+STRING: '"' (~('"'))* '"' ;
 WS : [ \t\r\n]+ -> skip ;
 
 OP_BANG: '!';
