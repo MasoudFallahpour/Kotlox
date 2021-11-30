@@ -7,6 +7,7 @@ class Tokens(private val tokens: List<Token>) {
 
     private var currentTokenIndex = 0
 
+    // match
     fun getNextTokenIfItHasType(vararg types: TokenType): Boolean {
         for (type in types) {
             if (nextTokenHasType(type)) {
@@ -17,6 +18,7 @@ class Tokens(private val tokens: List<Token>) {
         return false
     }
 
+    // check
     fun nextTokenHasType(type: TokenType): Boolean =
         if (isAtEnd()) {
             false
@@ -24,6 +26,7 @@ class Tokens(private val tokens: List<Token>) {
             peekNextToken().type == type
         }
 
+    // advance
     fun getNextToken(): Token {
         if (!isAtEnd()) {
             currentTokenIndex++
@@ -31,12 +34,22 @@ class Tokens(private val tokens: List<Token>) {
         return getPreviousToken()
     }
 
-    // Returns the most recently consumed token
-    fun getPreviousToken(): Token = tokens[currentTokenIndex - 1]
+    // Returns the most recently consumed token.
+    // previous
+    fun getPreviousToken(): Token =
+        if (currentTokenIndex >= 1) {
+            tokens[currentTokenIndex - 1]
+        } else {
+            tokens[0]
+        }
 
-    // Returns the next token we have yet to consume
+    // FIXME check currentTokenIndex to be in range
+    // Returns the next token we have yet to consume.
+    // peek
     fun peekNextToken(): Token = tokens[currentTokenIndex]
 
+    // FIXME the very last token of the tokens list should always be a EOF token otherwise
+    //  this method will not work correctly
     fun isAtEnd() = peekNextToken().type == TokenType.EOF
 
 }
