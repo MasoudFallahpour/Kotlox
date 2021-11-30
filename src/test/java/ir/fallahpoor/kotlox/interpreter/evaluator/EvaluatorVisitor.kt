@@ -6,6 +6,7 @@ import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 
 class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
 
+    // Evaluates rule: expression → equality ("," equality)*;
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? {
         var currentValue: Any? = visitEquality(ctx.equality(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -14,94 +15,153 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         return currentValue
     }
 
+    // Evaluates rule: equality → comparison ( ( "!=" | "==" ) comparison )*;
     override fun visitEquality(ctx: LoxParser.EqualityContext): Any? {
         var currentValue: Any? = visitComparison(ctx.comparison(0))
         for (i in 0..ctx.op.lastIndex) {
-            currentValue =
-                when (ctx.op[i].type) {
-                    LoxLexer.OP_EQUAL -> isEqual(currentValue, visitComparison(ctx.comparison(i + 1)))
-                    LoxLexer.OP_INEQUAL -> !isEqual(currentValue, visitComparison(ctx.comparison(i + 1)))
-                    else -> throw RuntimeException()
-                }
+            currentValue = evaluateEquality(
+                currentValue = currentValue,
+                opType = ctx.op[i].type,
+                comparisonContext = ctx.comparison(i + 1)
+            )
         }
         return currentValue
     }
 
+    private fun evaluateEquality(
+        currentValue: Any?,
+        opType: Int,
+        comparisonContext: LoxParser.ComparisonContext
+    ): Any = when (opType) {
+        LoxLexer.OP_EQUAL -> isEqual(currentValue, visitComparison(comparisonContext))
+        LoxLexer.OP_INEQUAL -> !isEqual(currentValue, visitComparison(comparisonContext))
+        else -> throw RuntimeException()
+    }
+
+    // Evaluates rule: comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
     override fun visitComparison(ctx: LoxParser.ComparisonContext): Any? {
         var currentValue: Any? = visitTerm(ctx.term(0))
         for (i in 0..ctx.op.lastIndex) {
-            currentValue =
-                when (ctx.op[i].type) {
-                    LoxLexer.OP_GREATER -> {
-                        val right: Any? = visitTerm(ctx.term(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) > (right as Double)
-                    }
-                    LoxLexer.OP_LESS -> {
-                        val right: Any? = visitTerm(ctx.term(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) < (right as Double)
-                    }
-                    LoxLexer.OP_GREATER_EQUAL -> {
-                        val right: Any? = visitTerm(ctx.term(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) >= (right as Double)
-                    }
-                    LoxLexer.OP_LESS_EQUAL -> {
-                        val right: Any? = visitTerm(ctx.term(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) <= (right as Double)
-                    }
-                    else -> throw RuntimeException()
-                }
+            currentValue = evaluateComparison(
+                currentValue = currentValue,
+                opType = ctx.op[i].type,
+                termContext = ctx.term(i + 1)
+            )
         }
         return currentValue
     }
 
+    private fun evaluateComparison(
+        currentValue: Any?,
+        opType: Int,
+        termContext: LoxParser.TermContext
+    ): Any = when (opType) {
+        LoxLexer.OP_GREATER -> {
+            val right: Any? = visitTerm(termContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) > (right as Double)
+        }
+        LoxLexer.OP_LESS -> {
+            val right: Any? = visitTerm(termContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) < (right as Double)
+        }
+        LoxLexer.OP_GREATER_EQUAL -> {
+            val right: Any? = visitTerm(termContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) >= (right as Double)
+        }
+        LoxLexer.OP_LESS_EQUAL -> {
+            val right: Any? = visitTerm(termContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) <= (right as Double)
+        }
+        else -> throw RuntimeException()
+    }
+
+    // Evaluates rule: term → factor ( ( "-" | "+" ) factor )*;
     override fun visitTerm(ctx: LoxParser.TermContext): Any? {
         var currentValue: Any? = visitFactor(ctx.factor(0))
         for (i in 0..ctx.op.lastIndex) {
-            currentValue =
-                when (ctx.op[i].type) {
-                    LoxLexer.OP_MINUS -> {
-                        val right: Any? = visitFactor(ctx.factor(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) - (right as Double)
-                    }
-                    LoxLexer.OP_PLUS -> {
-                        val right: Any? = visitFactor(ctx.factor(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) + (right as Double)
-                    }
-                    else -> throw RuntimeException()
-                }
+            currentValue = evaluateTerm(
+                currentValue = currentValue,
+                opType = ctx.op[i].type,
+                factorContext = ctx.factor(i + 1)
+            )
         }
         return currentValue
     }
 
+    private fun evaluateTerm(
+        currentValue: Any?,
+        opType: Int,
+        factorContext: LoxParser.FactorContext
+    ): Any = when (opType) {
+        LoxLexer.OP_MINUS -> {
+            val right: Any? = visitFactor(factorContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) - (right as Double)
+        }
+        LoxLexer.OP_PLUS -> {
+            val right: Any? = visitFactor(factorContext)
+            if (currentValue is Double && right is Double) {
+                currentValue + right
+            } else if (currentValue is String && right is String) {
+                currentValue + right
+            } else if (currentValue is Double && right is String) {
+                if (checkNumberIsWhole(currentValue)) {
+                    currentValue.toInt().toString() + right
+                } else {
+                    throw RuntimeException("Incompatible operand types for '+'")
+                }
+            } else if (currentValue is String && right is Double) {
+                if (checkNumberIsWhole(right)) {
+                    currentValue + right.toInt().toString()
+                } else {
+                    throw RuntimeException("Incompatible operand types for '+'")
+                }
+            } else {
+                throw throw RuntimeException("Incompatible operand types for '+'")
+            }
+        }
+        else -> throw RuntimeException()
+    }
+
+    private fun checkNumberIsWhole(number: Double): Boolean =
+        number.toString().endsWith(".0")
+
+    // Evaluates rule: factor → unary ( ( "/" | "*" ) unary )*;
     override fun visitFactor(ctx: LoxParser.FactorContext): Any? {
         var currentValue: Any? = visitUnary(ctx.unary(0))
         for (i in 0..ctx.op.lastIndex) {
-            currentValue =
-                when (ctx.op[i].type) {
-                    LoxLexer.OP_STAR -> {
-                        val right: Any? = visitUnary(ctx.unary(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) * (right as Double)
-                    }
-                    LoxLexer.OP_SLASH -> {
-                        val right: Any? = visitUnary(ctx.unary(i + 1))
-                        checkOperandsAreNumber(currentValue, right)
-                        (currentValue as Double) / (right as Double)
-                    }
-                    else -> {
-                        throw RuntimeException()
-                    }
-                }
+            currentValue = evaluateFactor(
+                currentValue = currentValue,
+                opType = ctx.op[i].type,
+                unaryContext = ctx.unary(i + 1)
+            )
         }
         return currentValue
     }
 
+    private fun evaluateFactor(
+        currentValue: Any?,
+        opType: Int,
+        unaryContext: LoxParser.UnaryContext
+    ): Any = when (opType) {
+        LoxLexer.OP_STAR -> {
+            val right: Any? = visitUnary(unaryContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) * (right as Double)
+        }
+        LoxLexer.OP_SLASH -> {
+            val right: Any? = visitUnary(unaryContext)
+            checkOperandsAreNumber(currentValue, right)
+            (currentValue as Double) / (right as Double)
+        }
+        else -> throw RuntimeException()
+    }
+
+    // Evaluates rule: unary → ( "!" | "-" ) unary | primary;
     override fun visitUnary(ctx: LoxParser.UnaryContext): Any? {
         return if (ctx.unary() == null) {
             visitPrimary(ctx.primary())
@@ -118,6 +178,8 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         }
     }
 
+    // TODO STRING is missing
+    // Evaluates rule: primary → NUMBER | "true" | "false" | "nil" | "(" expression ")"
     override fun visitPrimary(ctx: LoxParser.PrimaryContext): Any? =
         if (ctx.text == "true") {
             true

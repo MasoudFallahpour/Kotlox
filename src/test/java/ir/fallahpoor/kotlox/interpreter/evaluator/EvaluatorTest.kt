@@ -95,7 +95,7 @@ class EvaluatorTest {
     fun test5() {
 
         // Given
-        val source = "1 + 2 / 3 * -4 - 6 >= (7 - 8) * 9"
+        val source = "1 + 2 / 3 * -4 - 6 > (7 - 8) * 9"
 
         // When
         val actualValue: String? = evaluateSource(source)
@@ -160,6 +160,54 @@ class EvaluatorTest {
 
         // Given
         val source = "1, 2, 3, (4 + 5) / 6 <= 8 == 8"
+
+        // When
+        val actualValue: String? = evaluateSource(source)
+
+        // Then
+        val expectedValue: String? = evaluateSourceWithAntlr(source)
+        Truth.assertThat(actualValue).isEqualTo(expectedValue)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun test10() {
+
+        // Given
+        val source = "nil == nil"
+
+        // When
+        val actualValue: String? = evaluateSource(source)
+
+        // Then
+        val expectedValue: String? = evaluateSourceWithAntlr(source)
+        Truth.assertThat(actualValue).isEqualTo(expectedValue)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun test11() {
+
+        // Given
+        val source = "1 + \"hello\" + 1"
+
+        // When
+        val actualValue: String? = evaluateSource(source)
+
+        // Then
+        val expectedValue: String? = evaluateSourceWithAntlr(source)
+        Truth.assertThat(actualValue).isEqualTo(expectedValue)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun test12() {
+
+        // Given
+        val source = "\"Hello\" + \" World!\""
 
         // When
         val actualValue: String? = evaluateSource(source)
