@@ -13,6 +13,11 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
 class BuildAstVisitor : LoxBaseVisitor<Expr>() {
 
+    companion object {
+        private val NUMBER_REGEX = "\\d+(.\\d+)?".toRegex()
+        private val STRING_WITH_DOUBLE_QUOTES_REGEX = "\"[^\"]*\"".toRegex()
+    }
+
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Expr {
         var expr: Expr = visitEquality(ctx.equality(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -232,8 +237,10 @@ class BuildAstVisitor : LoxBaseVisitor<Expr>() {
             Expr.Literal(null)
         } else if (ctx.text.startsWith("(")) {
             Expr.Grouping(visit(ctx.expression()))
-        } else if (ctx.text.matches("\\d+(.\\d+)?".toRegex())) {
+        } else if (ctx.text.matches(NUMBER_REGEX)) {
             Expr.Literal(ctx.text.toDouble())
+        } else if (ctx.text.matches(STRING_WITH_DOUBLE_QUOTES_REGEX)) {
+            Expr.Literal(ctx.text.removePrefix("\"").removeSuffix("\""))
         } else {
             throw RuntimeException()
         }

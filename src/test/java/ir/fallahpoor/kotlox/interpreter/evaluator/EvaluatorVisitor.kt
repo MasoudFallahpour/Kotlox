@@ -6,6 +6,11 @@ import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 
 class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
 
+    companion object {
+        private val NUMBER_REGEX = "\\d+(.\\d+)?".toRegex()
+        private val STRING_WITH_DOUBLE_QUOTES_REGEX = "\"[^\"]*\"".toRegex()
+    }
+
     // Evaluates rule: expression → equality ("," equality)*;
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? {
         var currentValue: Any? = visitEquality(ctx.equality(0))
@@ -178,8 +183,7 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         }
     }
 
-    // TODO STRING is missing
-    // Evaluates rule: primary → NUMBER | "true" | "false" | "nil" | "(" expression ")"
+    // Evaluates rule: primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
     override fun visitPrimary(ctx: LoxParser.PrimaryContext): Any? =
         if (ctx.text == "true") {
             true
@@ -189,8 +193,10 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
             null
         } else if (ctx.text.startsWith("(")) {
             visit(ctx.expression())
-        } else if (ctx.text.matches("\\d+(.\\d+)?".toRegex())) {
+        } else if (ctx.text.matches(NUMBER_REGEX)) {
             ctx.text.toDouble()
+        } else if (ctx.text.matches(STRING_WITH_DOUBLE_QUOTES_REGEX)) {
+            ctx.text.removePrefix("\"").removeSuffix("\"")
         } else {
             throw RuntimeException()
         }

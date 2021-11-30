@@ -216,6 +216,23 @@ class ParserTest {
 
     }
 
+    @Test
+    fun test12() {
+
+        // Given
+        val source = "\"Lox\" != \"Kotlox\""
+        parser = createParser(source)
+
+        // When
+        val actualExpr: Expr? = parser.parse()
+
+        // Then
+        val expectedExpr: Expr? = getExpectedExpr(source)
+        Truth.assertThat(actualExpr).isEqualTo(expectedExpr)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun createParser(source: String): Parser {
         val scanner = Scanner(source.trimIndent(), errorReporter)
         val tokens: List<Token> = scanner.scanTokens()
