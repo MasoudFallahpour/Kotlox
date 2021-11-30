@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     application
     kotlin("jvm") version "1.6.0"
-    id("org.jetbrains.kotlinx.kover") version "0.4.2"
+    id("org.jetbrains.kotlinx.kover") version "0.4.4"
 }
 
 group = "ir.fallahpoor"
