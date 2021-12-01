@@ -11,12 +11,13 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class ScannerTest {
 
-    private lateinit var scanner: Scanner
-
     @Mock
     private lateinit var errorReporter: ErrorReporter
 
-    private fun createScannerWithSource(source: String) = Scanner(source.trimIndent(), errorReporter)
+    private fun scanSource(source: String): List<Token> {
+        val scanner = Scanner(source.trimIndent(), errorReporter)
+        return scanner.scanTokens()
+    }
 
     private fun createEofToken(line: Int) = Token(TokenType.EOF, "", null, line)
 
@@ -24,10 +25,10 @@ class ScannerTest {
     fun emptySource() {
 
         // Given
-        scanner = createScannerWithSource(source = "")
+        val source = ""
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(createEofToken(1))
@@ -40,14 +41,13 @@ class ScannerTest {
     fun testWhitespace() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
 
             """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(createEofToken(1))
@@ -60,15 +60,14 @@ class ScannerTest {
     fun testLineComment() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 // This is a comment and placing some token likes 'var a = 12' should not produce any token
                 true
                 """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -84,7 +83,7 @@ class ScannerTest {
     fun testBlockComment() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 for
                 /*
@@ -94,10 +93,9 @@ class ScannerTest {
                 /* another block comment */
                 123
                 """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -114,15 +112,14 @@ class ScannerTest {
     fun testNumber() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 123
                 123.456
                 """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -139,16 +136,15 @@ class ScannerTest {
     fun testIdentifier() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 formation
                 _private
                 ARRAY_LENGTH
             """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -166,16 +162,15 @@ class ScannerTest {
     fun testString() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 "This is a string"
                 "This is a multi-line
                 string"
             """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -192,15 +187,14 @@ class ScannerTest {
     fun testSingleCharTokens() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 (){},
                 .+-;*/
                 """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -226,14 +220,13 @@ class ScannerTest {
     fun testOneOrTwoCharTokens() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 !=! ===>>=<=<
                 """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -256,15 +249,14 @@ class ScannerTest {
     fun testKeywords() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 and class else false fun for if nil or print return super this true var while
                 android classic elsewhere superstitious
                 """
-        )
 
         // When
-        val actualTokens = scanner.scanTokens()
+        val actualTokens = scanSource(source)
 
         // Then
         val expectedTokens = listOf(
@@ -299,14 +291,13 @@ class ScannerTest {
     fun testUnexpectedCharError() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 $
                 """
-        )
 
         // When
-        scanner.scanTokens()
+        scanSource(source)
 
         // Then
         Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnexpectedChar('$'))
@@ -317,14 +308,13 @@ class ScannerTest {
     fun testUnterminatedStringError() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 "abc
                 """
-        )
 
         // When
-        scanner.scanTokens()
+        scanSource(source)
 
         // Then
         Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnterminatedString)
@@ -336,15 +326,14 @@ class ScannerTest {
     fun testUnterminatedBlockCommentError() {
 
         // Given
-        scanner = createScannerWithSource(
+        val source =
             """
                 /* this is an unterminated block comment
                    here we are on the next line
                 """
-        )
 
         // When
-        scanner.scanTokens()
+        scanSource(source)
 
         // Then
         Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UnterminatedBlockComment)
