@@ -9,6 +9,7 @@ sealed class Expr {
         fun visitGroupingExpr(expr: Grouping): R
         fun visitLiteralExpr(expr: Literal): R
         fun visitUnaryExpr(expr: Unary): R
+        fun visitVariableExpr(expr: Variable): R
     }
 
     data class Binary(
@@ -43,6 +44,14 @@ sealed class Expr {
     ) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitUnaryExpr(this)
+        }
+    }
+
+    data class Variable(
+        val name: Token
+    ) : Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitVariableExpr(this)
         }
     }
 

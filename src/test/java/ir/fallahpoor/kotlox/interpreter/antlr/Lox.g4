@@ -1,7 +1,14 @@
 grammar Lox;
 
 program
-    : statement* EOF ;
+    : declaration* EOF ;
+
+declaration
+    : varDecl
+    | statement ;
+
+varDecl
+    : 'var' IDENTIFIER ('=' expression)? ';' ;
 
 statement
     : exprStmt | printStmt ;
@@ -34,6 +41,7 @@ unary
 primary
     : NUMBER
     | STRING
+    | IDENTIFIER
     | 'true'
     | 'false'
     | 'nil'
@@ -41,6 +49,7 @@ primary
 
 NUMBER: [0-9]+ ('.' [0-9]+)? ;
 STRING: '"' (~('"'))* '"' ;
+IDENTIFIER: [a-zA-Z_][0-9a-zA-Z_]* ;
 WS : [ \t\r\n]+ -> skip ;
 
 OP_BANG: '!';

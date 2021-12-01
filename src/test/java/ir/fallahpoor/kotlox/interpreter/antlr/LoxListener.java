@@ -22,6 +22,34 @@ public interface LoxListener extends ParseTreeListener {
     void exitProgram(LoxParser.ProgramContext ctx);
 
     /**
+     * Enter a parse tree produced by {@link LoxParser#declaration}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterDeclaration(LoxParser.DeclarationContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#declaration}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitDeclaration(LoxParser.DeclarationContext ctx);
+
+    /**
+     * Enter a parse tree produced by {@link LoxParser#varDecl}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterVarDecl(LoxParser.VarDeclContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#varDecl}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitVarDecl(LoxParser.VarDeclContext ctx);
+
+    /**
      * Enter a parse tree produced by {@link LoxParser#statement}.
      *
      * @param ctx the parse tree

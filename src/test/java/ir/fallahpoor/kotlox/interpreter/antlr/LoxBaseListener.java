@@ -34,6 +34,42 @@ public class LoxBaseListener implements LoxListener {
      * <p>The default implementation does nothing.</p>
      */
     @Override
+    public void enterDeclaration(LoxParser.DeclarationContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void exitDeclaration(LoxParser.DeclarationContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void enterVarDecl(LoxParser.VarDeclContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void exitVarDecl(LoxParser.VarDeclContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
     public void enterStatement(LoxParser.StatementContext ctx) {
     }
 

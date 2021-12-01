@@ -1,6 +1,7 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
 import com.google.common.truth.Truth
+import ir.fallahpoor.kotlox.interpreter.Environment
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.TestPrinter
@@ -266,6 +267,28 @@ class InterpreterTest {
 
     }
 
+    @Test
+    fun test14() {
+
+        // Given
+        val source =
+            """var a = 1;
+               var b = 1;
+               print a + b;
+             """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedPrinter = TestPrinter()
+        interpretSourceWithAntlr(source, expectedPrinter)
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun interpretSource(source: String, printer: TestPrinter) {
         val statements: List<Stmt> = parseSource(source)
         if (statements.isNotEmpty()) {
@@ -289,8 +312,13 @@ class InterpreterTest {
             errorHandler = BailErrorStrategy()
         }
         try {
+            val environment = Environment()
             val programContext: LoxParser.ProgramContext = loxParser.program()
-            InterpretStmtVisitor(InterpretExprVisitor(), printer).visitProgram(programContext)
+            InterpretStmtVisitor(
+                interpretExprVisitor = InterpretExprVisitor(environment),
+                environment = environment,
+                printer = printer
+            ).visitProgram(programContext)
         } catch (e: RuntimeException) {
         }
     }

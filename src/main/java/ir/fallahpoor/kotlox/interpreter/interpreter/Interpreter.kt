@@ -1,11 +1,9 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
-import ir.fallahpoor.kotlox.interpreter.ErrorReporter
-import ir.fallahpoor.kotlox.interpreter.Expr
-import ir.fallahpoor.kotlox.interpreter.Printer
-import ir.fallahpoor.kotlox.interpreter.Stmt
+import ir.fallahpoor.kotlox.interpreter.*
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
+
 
 class Interpreter(
     private val errorReporter: ErrorReporter,
@@ -17,6 +15,8 @@ class Interpreter(
         private const val ERROR_MESSAGE_OPERAND_MUST_BE_A_NUMBER = "Operand must be a number."
         private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
+
+    private val environment = Environment()
 
     fun interpret(statements: List<Stmt>) {
         try {
@@ -158,6 +158,17 @@ class Interpreter(
         val value: Any? = evaluate(stmt.expression)
         printer.println(stringify(value))
     }
+
+    override fun visitVarStmt(stmt: Stmt.Var) {
+        val value: Any? = if (stmt.initializer != null) {
+            evaluate(stmt.initializer)
+        } else {
+            null
+        }
+        environment.define(stmt.name.lexeme, value)
+    }
+
+    override fun visitVariableExpr(expr: Expr.Variable): Any? = environment.get(expr.name)
 
     // 'false' and 'nil' are falsey, and everything else is truthy.
     private fun isTruthy(any: Any?): Boolean =

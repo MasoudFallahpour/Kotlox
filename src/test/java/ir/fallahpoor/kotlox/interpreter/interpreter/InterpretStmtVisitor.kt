@@ -1,21 +1,44 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
+import ir.fallahpoor.kotlox.interpreter.Environment
 import ir.fallahpoor.kotlox.interpreter.Printer
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 
 class InterpretStmtVisitor(
     private val interpretExprVisitor: InterpretExprVisitor,
+    private val environment: Environment,
     private val printer: Printer
 ) : LoxBaseVisitor<Unit>() {
 
-    // Evaluates rule: program → statement* EOF
+    // Evaluates rule: program → declaration* EOF
     override fun visitProgram(ctx: LoxParser.ProgramContext) {
-        if (ctx.statement().isNotEmpty()) {
-            for (i in 0..ctx.statement().lastIndex) {
-                visitStatement(ctx.statement(i))
+        if (ctx.declaration().isNotEmpty()) {
+            for (i in 0..ctx.declaration().lastIndex) {
+                visitDeclaration(ctx.declaration(i))
             }
         }
+    }
+
+    // Evaluates rule: declaration -> varDecl | statement
+    override fun visitDeclaration(ctx: LoxParser.DeclarationContext) {
+        if (ctx.varDecl() != null) {
+            visitVarDecl(ctx.varDecl())
+        } else if (ctx.statement() != null) {
+            visitStatement(ctx.statement())
+        } else {
+            throw RuntimeException()
+        }
+    }
+
+    // Evaluates rule: varDecl -> "var" IDENTIFIER ("=" expression)? ";"
+    override fun visitVarDecl(ctx: LoxParser.VarDeclContext) {
+        val value: Any? = if (ctx.expression() != null) {
+            interpretExprVisitor.visitExpression(ctx.expression())
+        } else {
+            null
+        }
+        environment.define(ctx.IDENTIFIER().symbol.text, value)
     }
 
     // Evaluates rule: statement → exprStmt | printStmt
@@ -37,7 +60,7 @@ class InterpretStmtVisitor(
 
     // Evaluates rule: exprStmt → expression ";"
     override fun visitExprStmt(ctx: LoxParser.ExprStmtContext) {
-        visit(ctx.expression())
+        interpretExprVisitor.visitExpression(ctx.expression())
     }
 
     private fun stringify(any: Any?): String =

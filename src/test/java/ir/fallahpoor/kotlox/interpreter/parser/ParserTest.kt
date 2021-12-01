@@ -7,7 +7,6 @@ import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
-import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 import org.antlr.v4.runtime.BailErrorStrategy
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -19,8 +18,9 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import java.io.ByteArrayInputStream
 
-// TODO add tests for checking if the parser reports syntax errors correctly when
-//  error handling is fully in place.
+// TODO add tests for checking if the parser handles errors correctly:
+//  - proper error message should be displayed
+//  - proper synchronization should be done
 
 @RunWith(MockitoJUnitRunner::class)
 class ParserTest {
@@ -166,28 +166,8 @@ class ParserTest {
 
     }
 
-    @Test(expected = Parser.ParseError::class)
-    fun test9() {
-
-        // Given
-        val source = "(1;"
-        parser = createParser(source)
-
-        // When
-        val actualStatements: List<Stmt> = parser.parse()
-
-        // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
-        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
-        Mockito.verify(errorReporter).error(
-            Token(TokenType.RIGHT_PAREN, ")", null, 1),
-            "Expect ')' after expression."
-        )
-
-    }
-
     @Test
-    fun test10() {
+    fun test9() {
 
         // Given
         val source = "(1,2,3) == 3;"
@@ -204,7 +184,7 @@ class ParserTest {
     }
 
     @Test
-    fun test11() {
+    fun test10() {
 
         // Given
         val source = "1, 2, 3, (4 + 5) / 6 <= 8 == 8;"
@@ -221,10 +201,31 @@ class ParserTest {
     }
 
     @Test
-    fun test12() {
+    fun test11() {
 
         // Given
         val source = "\"Lox\" != \"Kotlox\";"
+        parser = createParser(source)
+
+        // When
+        val actualStatements: List<Stmt> = parser.parse()
+
+        // Then
+        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun test12() {
+
+        // Given
+        val source =
+            """print "one";
+             print true;
+             print 2 + 1;
+             """
         parser = createParser(source)
 
         // When
@@ -242,9 +243,9 @@ class ParserTest {
 
         // Given
         val source =
-            """print "one";
-             print true;
-             print 2 + 1;
+            """var a = 1;
+               var b = 1;
+               print a + b;
              """
         parser = createParser(source)
 

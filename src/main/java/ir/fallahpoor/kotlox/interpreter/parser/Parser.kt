@@ -11,17 +11,19 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * unambiguous and has no left-recursive rules. Otherwise, it would not be possible to implement
  * such a parser.
  *
- * program    → statement* EOF
- * statement  → exprStmt | printStmt
- * exprStmt   → expression ";"
- * printStmt  → "print" expression ";"
- * expression → equality ("," equality)*
- * equality   → comparison ( ( "!=" | "==" ) comparison )*
- * comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*
- * term       → factor ( ( "-" | "+" ) factor )*
- * factor     → unary ( ( "/" | "*" ) unary )*
- * unary      → ( "!" | "-" ) unary | primary
- * primary    → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
+ * program     -> declaration* EOF
+ * declaration -> varDecl | statement
+ * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
+ * statement   -> exprStmt | printStmt
+ * exprStmt    -> expression ";"
+ * printStmt   -> "print" expression ";"
+ * expression  -> equality ("," equality)*
+ * equality    -> comparison ( ( "!=" | "==" ) comparison )*
+ * comparison  -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
+ * term        -> factor ( ( "-" | "+" ) factor )*
+ * factor      -> unary ( ( "/" | "*" ) unary )*
+ * unary       -> ( "!" | "-" ) unary | primary
+ * primary     -> NUMBER | STRING | IDENTIFIER | "true" | "false" | "nil" | "(" expression ")"
  */
 class Parser(
     private val tokens: Tokens,
@@ -33,9 +35,35 @@ class Parser(
     fun parse(): List<Stmt> {
         val statements = mutableListOf<Stmt>()
         while (!tokens.isAtEnd()) {
-            statements.add(statement())
+            val stmt: Stmt? = declaration()
+            if (stmt != null) {
+                statements.add(stmt)
+            }
         }
         return statements
+    }
+
+    private fun declaration(): Stmt? {
+        return try {
+            if (tokens.getNextTokenIfItHasType(TokenType.VAR)) {
+                varDeclaration()
+            } else {
+                statement()
+            }
+        } catch (error: ParseError) {
+            synchronize()
+            null
+        }
+    }
+
+    private fun varDeclaration(): Stmt {
+        val name: Token = consumeTokenOrThrowError(TokenType.IDENTIFIER, "Expect variable name.")
+        var initializer: Expr? = null
+        if (tokens.getNextTokenIfItHasType(TokenType.EQUAL)) {
+            initializer = expression()
+        }
+        consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return Stmt.Var(name, initializer)
     }
 
     private fun statement(): Stmt =
@@ -131,6 +159,8 @@ class Parser(
             Expr.Literal(null)
         } else if (tokens.getNextTokenIfItHasType(TokenType.NUMBER, TokenType.STRING)) {
             Expr.Literal(tokens.getPreviousToken().literal)
+        } else if (tokens.getNextTokenIfItHasType(TokenType.IDENTIFIER)) {
+            Expr.Variable(tokens.getPreviousToken())
         } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_PAREN)) {
             val expr = expression()
             consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after expression.")

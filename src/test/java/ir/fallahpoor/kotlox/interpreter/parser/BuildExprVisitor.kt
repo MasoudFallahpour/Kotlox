@@ -207,6 +207,14 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
             Expr.Literal(false)
         } else if (ctx.text == "nil") {
             Expr.Literal(null)
+        } else if (ctx.IDENTIFIER() != null) {
+            val token = Token(
+                TokenType.IDENTIFIER,
+                ctx.IDENTIFIER().symbol.text,
+                null,
+                ctx.IDENTIFIER().symbol.line
+            )
+            Expr.Variable(token)
         } else if (ctx.text.startsWith("(")) {
             Expr.Grouping(visit(ctx.expression()))
         } else if (ctx.text.matches(NUMBER_REGEX)) {

@@ -1,15 +1,15 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
+import ir.fallahpoor.kotlox.interpreter.Environment
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
+import ir.fallahpoor.kotlox.interpreter.scanner.Token
+import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
-class InterpretExprVisitor : LoxBaseVisitor<Any?>() {
-
-    companion object {
-        private val NUMBER_REGEX = "\\d+(.\\d+)?".toRegex()
-        private val STRING_WITH_DOUBLE_QUOTES_REGEX = "\"[^\"]*\"".toRegex()
-    }
+class InterpretExprVisitor(
+    private val environment: Environment
+) : LoxBaseVisitor<Any?>() {
 
     // Evaluates rule: expression → equality ("," equality)*
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? {
@@ -183,7 +183,7 @@ class InterpretExprVisitor : LoxBaseVisitor<Any?>() {
         }
     }
 
-    // Evaluates rule: primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
+    // Evaluates rule: primary → NUMBER | STRING | IDENTIFIER |"true" | "false" | "nil" | "(" expression ")"
     override fun visitPrimary(ctx: LoxParser.PrimaryContext): Any? =
         if (ctx.text == "true") {
             true
@@ -191,12 +191,20 @@ class InterpretExprVisitor : LoxBaseVisitor<Any?>() {
             false
         } else if (ctx.text == "nil") {
             null
+        } else if (ctx.IDENTIFIER() != null) {
+            val token = Token(
+                TokenType.IDENTIFIER,
+                ctx.IDENTIFIER().symbol.text,
+                null,
+                ctx.IDENTIFIER().symbol.line
+            )
+            environment.get(token)
         } else if (ctx.text.startsWith("(")) {
             visit(ctx.expression())
-        } else if (ctx.text.matches(NUMBER_REGEX)) {
-            ctx.text.toDouble()
-        } else if (ctx.text.matches(STRING_WITH_DOUBLE_QUOTES_REGEX)) {
-            ctx.text.removePrefix("\"").removeSuffix("\"")
+        } else if (ctx.NUMBER() != null) {
+            ctx.NUMBER().symbol.text.toDouble()
+        } else if (ctx.STRING() != null) {
+            ctx.STRING().text.removePrefix("\"").removeSuffix("\"")
         } else {
             throw RuntimeException()
         }
