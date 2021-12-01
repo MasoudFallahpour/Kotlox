@@ -18,14 +18,12 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import java.io.ByteArrayInputStream
 
-// TODO add tests for checking if the parser handles errors correctly:
+// TODO add tests to check if Parser handles errors correctly:
 //  - proper error message should be displayed
 //  - proper synchronization should be done
 
 @RunWith(MockitoJUnitRunner::class)
 class ParserTest {
-
-    private lateinit var parser: Parser
 
     @Mock
     private lateinit var errorReporter: ErrorReporter
@@ -35,10 +33,9 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * (4 - 5);"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -52,10 +49,9 @@ class ParserTest {
 
         // Given
         val source = "1 / 2 * 3;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -69,10 +65,9 @@ class ParserTest {
 
         // Given
         val source = "1 != 3 == 4;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -86,10 +81,9 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * -4 - 6;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -103,10 +97,9 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * -4 - 6 >= (7 - 8) * 9;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -120,10 +113,9 @@ class ParserTest {
 
         // Given
         val source = "1 + 2 / 3 * -4 - 6 >= (7 - 8) * 9 == !(10.12 <= 13);"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -137,10 +129,9 @@ class ParserTest {
 
         // Given
         val source = "!true == false;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -154,10 +145,9 @@ class ParserTest {
 
         // Given
         val source = "12 <= -10 * (3 + 10) < 12;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -171,10 +161,9 @@ class ParserTest {
 
         // Given
         val source = "(1,2,3) == 3;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -188,10 +177,9 @@ class ParserTest {
 
         // Given
         val source = "1, 2, 3, (4 + 5) / 6 <= 8 == 8;"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -205,10 +193,9 @@ class ParserTest {
 
         // Given
         val source = "\"Lox\" != \"Kotlox\";"
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -226,10 +213,9 @@ class ParserTest {
              print true;
              print 2 + 1;
              """
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
@@ -247,16 +233,20 @@ class ParserTest {
                var b = 1;
                print a + b;
              """
-        parser = createParser(source)
 
         // When
-        val actualStatements: List<Stmt> = parser.parse()
+        val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
         val expectedStatements: List<Stmt>? = getExpectedStatements(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
+    }
+
+    private fun parseSource(source: String): List<Stmt> {
+        val parser = createParser(source)
+        return parser.parse()
     }
 
     private fun createParser(source: String): Parser {
