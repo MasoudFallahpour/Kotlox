@@ -116,6 +116,8 @@ class ScannerTest {
             """
                 123
                 123.456
+                .456
+                123.
                 """
 
         // When
@@ -125,7 +127,11 @@ class ScannerTest {
         val expectedTokens = listOf(
             Token(TokenType.NUMBER, "123", 123.0, 1),
             Token(TokenType.NUMBER, "123.456", 123.456, 2),
-            createEofToken(2)
+            Token(TokenType.DOT, ".", null, 3),
+            Token(TokenType.NUMBER, "456", 456.0, 3),
+            Token(TokenType.NUMBER, "123", 123.0, 4),
+            Token(TokenType.DOT, ".", null, 4),
+            createEofToken(4)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -138,9 +144,7 @@ class ScannerTest {
         // Given
         val source =
             """
-                formation
-                _private
-                ARRAY_LENGTH
+                formation _private ARRAY_LENGTH andy fo _ _123 _abc ab123 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_
             """
 
         // When
@@ -149,9 +153,16 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(
             Token(TokenType.IDENTIFIER, "formation", null, 1),
-            Token(TokenType.IDENTIFIER, "_private", null, 2),
-            Token(TokenType.IDENTIFIER, "ARRAY_LENGTH", null, 3),
-            createEofToken(3)
+            Token(TokenType.IDENTIFIER, "_private", null, 1),
+            Token(TokenType.IDENTIFIER, "ARRAY_LENGTH", null, 1),
+            Token(TokenType.IDENTIFIER, "andy", null, 1),
+            Token(TokenType.IDENTIFIER, "fo", null, 1),
+            Token(TokenType.IDENTIFIER, "_", null, 1),
+            Token(TokenType.IDENTIFIER, "_123", null, 1),
+            Token(TokenType.IDENTIFIER, "_abc", null, 1),
+            Token(TokenType.IDENTIFIER, "ab123", null, 1),
+            Token(TokenType.IDENTIFIER, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", null, 1),
+            createEofToken(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
