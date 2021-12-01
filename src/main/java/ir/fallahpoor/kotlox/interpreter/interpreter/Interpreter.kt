@@ -1,11 +1,16 @@
-package ir.fallahpoor.kotlox.interpreter.evaluator
+package ir.fallahpoor.kotlox.interpreter.interpreter
 
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Expr
+import ir.fallahpoor.kotlox.interpreter.Printer
+import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
-class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
+class Interpreter(
+    private val errorReporter: ErrorReporter,
+    private val printer: Printer
+) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
     companion object {
         private const val ERROR_MESSAGE_INCOMPATIBLE_TYPES = "Operands are incompatible."
@@ -13,14 +18,19 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
         private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
 
-    fun evaluate(expression: Expr): String? =
+    fun interpret(statements: List<Stmt>) {
         try {
-            val value = eval(expression)
-            stringify(value)
+            for (statement in statements) {
+                execute(statement)
+            }
         } catch (error: RuntimeError) {
             errorReporter.runtimeError(error)
-            null
         }
+    }
+
+    private fun execute(stmt: Stmt) {
+        stmt.accept(this)
+    }
 
     private fun stringify(any: Any?): String =
         when (any) {
@@ -37,8 +47,8 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
 
-        val left: Any? = eval(expr.left)
-        val right: Any? = eval(expr.right)
+        val left: Any? = evaluate(expr.left)
+        val right: Any? = evaluate(expr.right)
 
         return when (expr.operator.type) {
             TokenType.COMMA -> right
@@ -122,14 +132,14 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
             a.equals(b)
         }
 
-    override fun visitGroupingExpr(expr: Expr.Grouping): Any? = eval(expr.expression)
+    override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)
 
-    private fun eval(expr: Expr): Any? = expr.accept(this)
+    private fun evaluate(expr: Expr): Any? = expr.accept(this)
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? = expr.value
 
     override fun visitUnaryExpr(expr: Expr.Unary): Any? {
-        val right: Any? = eval(expr.right)
+        val right: Any? = evaluate(expr.right)
         return when (expr.operator.type) {
             TokenType.BANG -> !isTruthy(right)
             TokenType.MINUS -> {
@@ -138,6 +148,15 @@ class Evaluator(private val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
             }
             else -> null // Unreachable.
         }
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression) {
+        evaluate(stmt.expression)
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print) {
+        val value: Any? = evaluate(stmt.expression)
+        printer.println(stringify(value))
     }
 
     // 'false' and 'nil' are falsey, and everything else is truthy.

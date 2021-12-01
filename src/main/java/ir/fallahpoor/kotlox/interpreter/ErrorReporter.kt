@@ -1,10 +1,12 @@
 package ir.fallahpoor.kotlox.interpreter
 
-import ir.fallahpoor.kotlox.interpreter.evaluator.RuntimeError
+import ir.fallahpoor.kotlox.interpreter.interpreter.RuntimeError
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
-class ErrorReporter {
+class ErrorReporter(
+    private val printer: Printer
+) {
 
     sealed class Error(val message: String) {
         data class UnexpectedChar(private val char: Char) : Error("Unexpected char '$char'")
@@ -16,7 +18,7 @@ class ErrorReporter {
     var hadRuntimeError = false
 
     fun runtimeError(error: RuntimeError) {
-        System.err.println("[line " + error.token.line + "] " + error.message)
+        printer.printlnError("[line " + error.token.line + "] " + error.message)
         hadRuntimeError = true
     }
 
@@ -33,7 +35,7 @@ class ErrorReporter {
     }
 
     private fun report(line: Int, where: String, message: String) {
-        System.err.println("[line $line] Error$where: $message")
+        printer.printlnError("[line $line] Error$where: $message")
         hadError = true
     }
 

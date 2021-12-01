@@ -7,7 +7,7 @@ private const val DOUBLE_INDENT = SINGLE_INDENT + SINGLE_INDENT
 private const val TRIPLE_INDENT = SINGLE_INDENT + DOUBLE_INDENT
 
 fun main() {
-    val outputDir = "./src/main/kotlin/ir/fallahpoor/kotlox/interpreter"
+    val outputDir = "./src/main/java/ir/fallahpoor/kotlox/interpreter"
     defineAst(
         outputDir,
         "Expr",
@@ -16,6 +16,14 @@ fun main() {
             "Grouping -> expression: Expr",
             "Literal  -> value: Any?",
             "Unary    -> operator: Token, right: Expr"
+        )
+    )
+    defineAst(
+        outputDir,
+        "Stmt",
+        listOf(
+            "Expression -> expression: Expr",
+            "Print      -> expression: Expr"
         )
     )
 }
@@ -48,7 +56,7 @@ private fun defineType(
     className: String,
     propertyList: String
 ) {
-    writer.println("${SINGLE_INDENT}class $className(")
+    writer.println("${SINGLE_INDENT}data class $className(")
     val properties = propertyList.split(", ")
     properties.forEachIndexed { i, v ->
         if (i != properties.lastIndex) {

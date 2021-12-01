@@ -1,6 +1,6 @@
 package ir.fallahpoor.kotlox.interpreter
 
-import ir.fallahpoor.kotlox.interpreter.evaluator.Evaluator
+import ir.fallahpoor.kotlox.interpreter.interpreter.Interpreter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
@@ -14,8 +14,9 @@ import kotlin.system.exitProcess
 
 class Lox(private val commandLineArgs: Array<String>) {
 
-    private val errorReporter = ErrorReporter()
-    private val evaluator = Evaluator(errorReporter)
+    private val printer = Printer()
+    private val errorReporter = ErrorReporter(printer)
+    private val interpreter = Interpreter(errorReporter, printer)
 
     private object ErrorCode {
         // Lox is used with an incorrect number of arguments
@@ -70,18 +71,13 @@ class Lox(private val commandLineArgs: Array<String>) {
         val scanner = Scanner(source, errorReporter)
         val tokens: List<Token> = scanner.scanTokens()
         val parser = Parser(Tokens(tokens), errorReporter)
-        val expression: Expr? = parser.parse()
+        val statements: List<Stmt> = parser.parse()
         // Stop if there was a syntax error.
         if (errorReporter.hadError) {
             println()
             return
         }
-        expression?.let {
-            val result: String? = evaluator.evaluate(it)
-            result?.let {
-                println(result)
-            }
-        }
+        interpreter.interpret(statements)
         if (errorReporter.hadRuntimeError) {
             println()
         }

@@ -11,6 +11,38 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     /**
+     * Visit a parse tree produced by {@link LoxParser#program}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitProgram(LoxParser.ProgramContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#statement}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitStatement(LoxParser.StatementContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#exprStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitExprStmt(LoxParser.ExprStmtContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#printStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitPrintStmt(LoxParser.PrintStmtContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link LoxParser#expression}.
      *
      * @param ctx the parse tree

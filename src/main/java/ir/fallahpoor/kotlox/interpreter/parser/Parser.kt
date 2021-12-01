@@ -2,6 +2,7 @@ package ir.fallahpoor.kotlox.interpreter.parser
 
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Expr
+import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
@@ -10,12 +11,16 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * unambiguous and has no left-recursive rules. Otherwise, it would not be possible to implement
  * such a parser.
  *
- * expression → equality ("," equality)*;
- * equality   → comparison ( ( "!=" | "==" ) comparison )*;
- * comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
- * term       → factor ( ( "-" | "+" ) factor )*;
- * factor     → unary ( ( "/" | "*" ) unary )*;
- * unary      → ( "!" | "-" ) unary | primary;
+ * program    → statement* EOF
+ * statement  → exprStmt | printStmt
+ * exprStmt   → expression ";"
+ * printStmt  → "print" expression ";"
+ * expression → equality ("," equality)*
+ * equality   → comparison ( ( "!=" | "==" ) comparison )*
+ * comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*
+ * term       → factor ( ( "-" | "+" ) factor )*
+ * factor     → unary ( ( "/" | "*" ) unary )*
+ * unary      → ( "!" | "-" ) unary | primary
  * primary    → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
  */
 class Parser(
@@ -23,14 +28,34 @@ class Parser(
     private val errorReporter: ErrorReporter
 ) {
 
-    private class ParseError : RuntimeException()
+    class ParseError : RuntimeException()
 
-    fun parse(): Expr? =
-        try {
-            expression()
-        } catch (error: ParseError) {
-            null
+    fun parse(): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
+        while (!tokens.isAtEnd()) {
+            statements.add(statement())
         }
+        return statements
+    }
+
+    private fun statement(): Stmt =
+        if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
+            printStatement()
+        } else {
+            expressionStatement()
+        }
+
+    private fun printStatement(): Stmt {
+        val value = expression()
+        consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Stmt.Print(value)
+    }
+
+    private fun expressionStatement(): Stmt {
+        val expr = expression()
+        consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Stmt.Expression(expr)
+    }
 
     private fun expression(): Expr {
         var expr: Expr = equality()

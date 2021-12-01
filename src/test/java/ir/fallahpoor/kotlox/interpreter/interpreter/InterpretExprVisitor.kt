@@ -1,17 +1,17 @@
-package ir.fallahpoor.kotlox.interpreter.evaluator
+package ir.fallahpoor.kotlox.interpreter.interpreter
 
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 
-class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
+class InterpretExprVisitor : LoxBaseVisitor<Any?>() {
 
     companion object {
         private val NUMBER_REGEX = "\\d+(.\\d+)?".toRegex()
         private val STRING_WITH_DOUBLE_QUOTES_REGEX = "\"[^\"]*\"".toRegex()
     }
 
-    // Evaluates rule: expression → equality ("," equality)*;
+    // Evaluates rule: expression → equality ("," equality)*
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? {
         var currentValue: Any? = visitEquality(ctx.equality(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -20,7 +20,7 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         return currentValue
     }
 
-    // Evaluates rule: equality → comparison ( ( "!=" | "==" ) comparison )*;
+    // Evaluates rule: equality → comparison ( ( "!=" | "==" ) comparison )*
     override fun visitEquality(ctx: LoxParser.EqualityContext): Any? {
         var currentValue: Any? = visitComparison(ctx.comparison(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -43,7 +43,7 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         else -> throw RuntimeException()
     }
 
-    // Evaluates rule: comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
+    // Evaluates rule: comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*
     override fun visitComparison(ctx: LoxParser.ComparisonContext): Any? {
         var currentValue: Any? = visitTerm(ctx.term(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -84,7 +84,7 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         else -> throw RuntimeException()
     }
 
-    // Evaluates rule: term → factor ( ( "-" | "+" ) factor )*;
+    // Evaluates rule: term → factor ( ( "-" | "+" ) factor )*
     override fun visitTerm(ctx: LoxParser.TermContext): Any? {
         var currentValue: Any? = visitFactor(ctx.factor(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -135,7 +135,7 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
     private fun checkNumberIsWhole(number: Double): Boolean =
         number.toString().endsWith(".0")
 
-    // Evaluates rule: factor → unary ( ( "/" | "*" ) unary )*;
+    // Evaluates rule: factor → unary ( ( "/" | "*" ) unary )*
     override fun visitFactor(ctx: LoxParser.FactorContext): Any? {
         var currentValue: Any? = visitUnary(ctx.unary(0))
         for (i in 0..ctx.op.lastIndex) {
@@ -166,7 +166,7 @@ class EvaluatorVisitor : LoxBaseVisitor<Any?>() {
         else -> throw RuntimeException()
     }
 
-    // Evaluates rule: unary → ( "!" | "-" ) unary | primary;
+    // Evaluates rule: unary → ( "!" | "-" ) unary | primary
     override fun visitUnary(ctx: LoxParser.UnaryContext): Any? {
         return if (ctx.unary() == null) {
             visitPrimary(ctx.primary())

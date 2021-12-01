@@ -8,6 +8,62 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface LoxListener extends ParseTreeListener {
     /**
+     * Enter a parse tree produced by {@link LoxParser#program}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterProgram(LoxParser.ProgramContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#program}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitProgram(LoxParser.ProgramContext ctx);
+
+    /**
+     * Enter a parse tree produced by {@link LoxParser#statement}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterStatement(LoxParser.StatementContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#statement}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitStatement(LoxParser.StatementContext ctx);
+
+    /**
+     * Enter a parse tree produced by {@link LoxParser#exprStmt}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterExprStmt(LoxParser.ExprStmtContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#exprStmt}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitExprStmt(LoxParser.ExprStmtContext ctx);
+
+    /**
+     * Enter a parse tree produced by {@link LoxParser#printStmt}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterPrintStmt(LoxParser.PrintStmtContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#printStmt}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitPrintStmt(LoxParser.PrintStmtContext ctx);
+
+    /**
      * Enter a parse tree produced by {@link LoxParser#expression}.
      *
      * @param ctx the parse tree
