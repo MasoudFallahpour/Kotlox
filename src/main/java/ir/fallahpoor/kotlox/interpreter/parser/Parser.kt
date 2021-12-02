@@ -14,7 +14,8 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * program     -> declaration* EOF
  * declaration -> varDecl | statement
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
- * statement   -> exprStmt | printStmt
+ * statement   -> exprStmt | printStmt | block
+ * block       -> "{" declaration* "}"
  * exprStmt    -> expression ";"
  * printStmt   -> "print" expression ";"
  * expression  -> assignment
@@ -70,6 +71,8 @@ class Parser(
     private fun statement(): Stmt =
         if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
             printStatement()
+        } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_BRACE)) {
+            Stmt.Block(block())
         } else {
             expressionStatement()
         }
@@ -78,6 +81,18 @@ class Parser(
         val value = expression()
         consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Print(value)
+    }
+
+    private fun block(): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
+        while (!tokens.nextTokenHasType(TokenType.RIGHT_BRACE) && !tokens.isAtEnd()) {
+            val declaration = declaration()
+            if (declaration != null) {
+                statements.add(declaration)
+            }
+        }
+        consumeTokenOrThrowError(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return statements
     }
 
     private fun expressionStatement(): Stmt {

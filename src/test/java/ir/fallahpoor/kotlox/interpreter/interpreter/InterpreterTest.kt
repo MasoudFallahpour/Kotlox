@@ -314,6 +314,44 @@ class InterpreterTest {
 
     }
 
+    @Test
+    fun test16() {
+
+        // Given
+        val source =
+            """var a = "global a";
+               var b = "global b";
+               var c = "global c";
+               {
+                    var a = "outer a";
+                    var b = "outer b";
+                    {
+                        var a = "inner a";
+                        print a;
+                        print b;
+                        print c;
+                    }
+                    print a;
+                    print b;
+                    print c;
+                }
+                print a;
+                print b;
+                print c;
+             """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedPrinter = TestPrinter()
+        interpretSourceWithAntlr(source, expectedPrinter)
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun interpretSource(source: String, printer: TestPrinter) {
         val statements: List<Stmt> = parseSource(source)
         if (statements.isNotEmpty()) {

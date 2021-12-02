@@ -267,6 +267,42 @@ class ParserTest {
 
     }
 
+    @Test
+    fun test15() {
+
+        // Given
+        val source =
+            """var a = "global a";
+               var b = "global b";
+               var c = "global c";
+               {
+                    var a = "outer a";
+                    var b = "outer b";
+                    {
+                        var a = "inner a";
+                        print a;
+                        print b;
+                        print c;
+                    }
+                    print a;
+                    print b;
+                    print c;
+                }
+                print a;
+                print b;
+                print c;
+             """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun parseSource(source: String): List<Stmt> {
         val parser = createParser(source)
         return parser.parse()

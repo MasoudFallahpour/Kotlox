@@ -8,7 +8,7 @@ import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
 class InterpretExprVisitor(
-    private val environment: Environment
+    var environment: Environment
 ) : LoxBaseVisitor<Any?>() {
 
     // Evaluates rule: expression -> assignment

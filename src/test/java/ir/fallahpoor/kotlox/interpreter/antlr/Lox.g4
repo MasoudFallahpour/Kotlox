@@ -11,13 +11,16 @@ varDecl
     : 'var' IDENTIFIER ('=' expression)? ';' ;
 
 statement
-    : exprStmt | printStmt ;
+    : exprStmt | printStmt | block ;
 
 exprStmt
     : expression ';' ;
 
 printStmt
     : 'print' expression ';' ;
+
+block
+    : '{' declaration* '}' ;
 
 expression
     : assignment ;

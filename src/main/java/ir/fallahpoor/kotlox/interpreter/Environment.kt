@@ -3,15 +3,17 @@ package ir.fallahpoor.kotlox.interpreter
 import ir.fallahpoor.kotlox.interpreter.interpreter.RuntimeError
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 
-class Environment {
+class Environment(private val parentEnvironment: Environment? = null) {
 
     private val values = mutableMapOf<String, Any?>()
 
     @Throws(RuntimeError::class)
     fun get(name: Token): Any? {
         val variableName: String = name.lexeme
-        if (values.containsKey(variableName)) {
-            return values[variableName]
+        return if (values.containsKey(variableName)) {
+            values[variableName]
+        } else if (parentEnvironment != null) {
+            parentEnvironment.get(name)
         } else {
             throw RuntimeError(name, "Undefined variable '$variableName'.")
         }
@@ -25,6 +27,8 @@ class Environment {
         val variableName: String = name.lexeme
         if (values.containsKey(variableName)) {
             values[variableName] = value
+        } else if (parentEnvironment != null) {
+            parentEnvironment.assign(name, value)
         } else {
             throw RuntimeError(name, "Undefined variable '$variableName'.")
         }

@@ -15,7 +15,7 @@ class Interpreter(
         private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
 
-    private val environment = Environment()
+    private var environment = Environment()
 
     fun interpret(statements: List<Stmt>) {
         try {
@@ -174,6 +174,22 @@ class Interpreter(
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? = environment.get(expr.name)
+
+    override fun visitBlockStmt(stmt: Stmt.Block) {
+        executeBlock(stmt.statements, Environment(environment))
+    }
+
+    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+        val previousEnvironment = this@Interpreter.environment
+        try {
+            this@Interpreter.environment = environment
+            for (statement in statements) {
+                execute(statement)
+            }
+        } finally {
+            this@Interpreter.environment = previousEnvironment
+        }
+    }
 
     // 'false' and 'nil' are falsey, and everything else is truthy.
     private fun isTruthy(any: Any?): Boolean =

@@ -47,6 +47,8 @@ class BuildStmtVisitor(
             visitExprStmt(ctx.exprStmt())
         } else if (ctx.printStmt() != null) {
             visitPrintStmt(ctx.printStmt())
+        } else if (ctx.block() != null) {
+            visitBlock(ctx.block())
         } else {
             throw RuntimeException()
         }
@@ -59,6 +61,16 @@ class BuildStmtVisitor(
     override fun visitPrintStmt(ctx: LoxParser.PrintStmtContext): List<Stmt> {
         val expr: Expr = buildExprVisitor.visitExpression(ctx.expression())
         return listOf(Stmt.Print(expr))
+    }
+
+    override fun visitBlock(ctx: LoxParser.BlockContext): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
+        if (ctx.declaration() != null && ctx.declaration().isNotEmpty()) {
+            ctx.declaration().forEach {
+                statements.addAll(visitDeclaration(it))
+            }
+        }
+        return listOf(Stmt.Block(statements))
     }
 
 }
