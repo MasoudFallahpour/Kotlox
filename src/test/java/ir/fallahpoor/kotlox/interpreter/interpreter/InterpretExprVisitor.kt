@@ -11,13 +11,29 @@ class InterpretExprVisitor(
     private val environment: Environment
 ) : LoxBaseVisitor<Any?>() {
 
-    // Evaluates rule: expression → equality ("," equality)*
-    override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? {
-        var currentValue: Any? = visitEquality(ctx.equality(0))
-        for (i in 0..ctx.op.lastIndex) {
-            currentValue = visitEquality(ctx.equality(i + 1))
+    // Evaluates rule: expression -> assignment
+    override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? =
+        visitAssignment(ctx.assignment())
+
+    // Evaluates rule: IDENTIFIER "=" assignment | equality ("," equality)*
+    override fun visitAssignment(ctx: LoxParser.AssignmentContext): Any? {
+        if (ctx.assign != null) {
+            val value = visitAssignment(ctx.assignment())
+            val token = Token(
+                TokenType.IDENTIFIER,
+                ctx.IDENTIFIER().symbol.text,
+                null,
+                ctx.IDENTIFIER().symbol.line
+            )
+            environment.assign(token, value)
+            return value
+        } else {
+            var currentValue: Any? = visitEquality(ctx.equality(0))
+            for (i in 0..ctx.op.lastIndex) {
+                currentValue = visitEquality(ctx.equality(i + 1))
+            }
+            return currentValue
         }
-        return currentValue
     }
 
     // Evaluates rule: equality → comparison ( ( "!=" | "==" ) comparison )*

@@ -29,14 +29,15 @@ public class LoxParser extends Parser {
             OP_LESS = 23, OP_GREATER_EQUAL = 24, OP_LESS_EQUAL = 25;
     public static final int
             RULE_program = 0, RULE_declaration = 1, RULE_varDecl = 2, RULE_statement = 3,
-            RULE_exprStmt = 4, RULE_printStmt = 5, RULE_expression = 6, RULE_equality = 7,
-            RULE_comparison = 8, RULE_term = 9, RULE_factor = 10, RULE_unary = 11,
-            RULE_primary = 12;
+            RULE_exprStmt = 4, RULE_printStmt = 5, RULE_expression = 6, RULE_assignment = 7,
+            RULE_equality = 8, RULE_comparison = 9, RULE_term = 10, RULE_factor = 11,
+            RULE_unary = 12, RULE_primary = 13;
 
     private static String[] makeRuleNames() {
         return new String[]{
                 "program", "declaration", "varDecl", "statement", "exprStmt", "printStmt",
-                "expression", "equality", "comparison", "term", "factor", "unary", "primary"
+                "expression", "assignment", "equality", "comparison", "term", "factor",
+                "unary", "primary"
         };
     }
 
@@ -167,21 +168,21 @@ public class LoxParser extends Parser {
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(29);
+                setState(31);
                 _errHandler.sync(this);
                 _la = _input.LA(1);
                 while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << NUMBER) | (1L << STRING) | (1L << IDENTIFIER) | (1L << OP_BANG) | (1L << OP_MINUS))) != 0)) {
                     {
                         {
-                            setState(26);
+                            setState(28);
                             declaration();
                         }
                     }
-                    setState(31);
+                    setState(33);
                     _errHandler.sync(this);
                     _la = _input.LA(1);
                 }
-                setState(32);
+                setState(34);
                 match(EOF);
             }
         } catch (RecognitionException re) {
@@ -233,13 +234,13 @@ public class LoxParser extends Parser {
         DeclarationContext _localctx = new DeclarationContext(_ctx, getState());
         enterRule(_localctx, 2, RULE_declaration);
         try {
-            setState(36);
+            setState(38);
             _errHandler.sync(this);
             switch (_input.LA(1)) {
                 case T__0:
                     enterOuterAlt(_localctx, 1);
                 {
-                    setState(34);
+                    setState(36);
                     varDecl();
                 }
                 break;
@@ -255,7 +256,7 @@ public class LoxParser extends Parser {
                 case OP_MINUS:
                     enterOuterAlt(_localctx, 2);
                 {
-                    setState(35);
+                    setState(37);
                     statement();
                 }
                 break;
@@ -314,23 +315,23 @@ public class LoxParser extends Parser {
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(38);
+                setState(40);
                 match(T__0);
-                setState(39);
+                setState(41);
                 match(IDENTIFIER);
-                setState(42);
+                setState(44);
                 _errHandler.sync(this);
                 _la = _input.LA(1);
                 if (_la == T__1) {
                     {
-                        setState(40);
+                        setState(42);
                         match(T__1);
-                        setState(41);
+                        setState(43);
                         expression();
                     }
                 }
 
-                setState(44);
+                setState(46);
                 match(T__2);
             }
         } catch (RecognitionException re) {
@@ -382,7 +383,7 @@ public class LoxParser extends Parser {
         StatementContext _localctx = new StatementContext(_ctx, getState());
         enterRule(_localctx, 6, RULE_statement);
         try {
-            setState(48);
+            setState(50);
             _errHandler.sync(this);
             switch (_input.LA(1)) {
                 case T__5:
@@ -396,14 +397,14 @@ public class LoxParser extends Parser {
                 case OP_MINUS:
                     enterOuterAlt(_localctx, 1);
                 {
-                    setState(46);
+                    setState(48);
                     exprStmt();
                 }
                 break;
                 case T__3:
                     enterOuterAlt(_localctx, 2);
                 {
-                    setState(47);
+                    setState(49);
                     printStmt();
                 }
                 break;
@@ -457,9 +458,9 @@ public class LoxParser extends Parser {
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(50);
+                setState(52);
                 expression();
-                setState(51);
+                setState(53);
                 match(T__2);
             }
         } catch (RecognitionException re) {
@@ -509,11 +510,11 @@ public class LoxParser extends Parser {
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(53);
-                match(T__3);
-                setState(54);
-                expression();
                 setState(55);
+                match(T__3);
+                setState(56);
+                expression();
+                setState(57);
                 match(T__2);
             }
         } catch (RecognitionException re) {
@@ -527,15 +528,8 @@ public class LoxParser extends Parser {
     }
 
     public static class ExpressionContext extends ParserRuleContext {
-        public Token s5;
-        public List<Token> op = new ArrayList<Token>();
-
-        public List<EqualityContext> equality() {
-            return getRuleContexts(EqualityContext.class);
-        }
-
-        public EqualityContext equality(int i) {
-            return getRuleContext(EqualityContext.class, i);
+        public AssignmentContext assignment() {
+            return getRuleContext(AssignmentContext.class, 0);
         }
 
         public ExpressionContext(ParserRuleContext parent, int invokingState) {
@@ -567,29 +561,112 @@ public class LoxParser extends Parser {
     public final ExpressionContext expression() throws RecognitionException {
         ExpressionContext _localctx = new ExpressionContext(_ctx, getState());
         enterRule(_localctx, 12, RULE_expression);
-        int _la;
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(57);
-                equality();
-                setState(62);
-                _errHandler.sync(this);
-                _la = _input.LA(1);
-                while (_la == T__4) {
-                    {
-                        {
-                            setState(58);
-                            ((ExpressionContext) _localctx).s5 = match(T__4);
-                            ((ExpressionContext) _localctx).op.add(((ExpressionContext) _localctx).s5);
-                            setState(59);
-                            equality();
-                        }
-                    }
+                setState(59);
+                assignment();
+            }
+        } catch (RecognitionException re) {
+            _localctx.exception = re;
+            _errHandler.reportError(this, re);
+            _errHandler.recover(this, re);
+        } finally {
+            exitRule();
+        }
+        return _localctx;
+    }
+
+    public static class AssignmentContext extends ParserRuleContext {
+        public Token assign;
+        public Token s5;
+        public List<Token> op = new ArrayList<Token>();
+
+        public TerminalNode IDENTIFIER() {
+            return getToken(LoxParser.IDENTIFIER, 0);
+        }
+
+        public AssignmentContext assignment() {
+            return getRuleContext(AssignmentContext.class, 0);
+        }
+
+        public List<EqualityContext> equality() {
+            return getRuleContexts(EqualityContext.class);
+        }
+
+        public EqualityContext equality(int i) {
+            return getRuleContext(EqualityContext.class, i);
+        }
+
+        public AssignmentContext(ParserRuleContext parent, int invokingState) {
+            super(parent, invokingState);
+        }
+
+        @Override
+        public int getRuleIndex() {
+            return RULE_assignment;
+        }
+
+        @Override
+        public void enterRule(ParseTreeListener listener) {
+            if (listener instanceof LoxListener) ((LoxListener) listener).enterAssignment(this);
+        }
+
+        @Override
+        public void exitRule(ParseTreeListener listener) {
+            if (listener instanceof LoxListener) ((LoxListener) listener).exitAssignment(this);
+        }
+
+        @Override
+        public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+            if (visitor instanceof LoxVisitor) return ((LoxVisitor<? extends T>) visitor).visitAssignment(this);
+            else return visitor.visitChildren(this);
+        }
+    }
+
+    public final AssignmentContext assignment() throws RecognitionException {
+        AssignmentContext _localctx = new AssignmentContext(_ctx, getState());
+        enterRule(_localctx, 14, RULE_assignment);
+        int _la;
+        try {
+            setState(72);
+            _errHandler.sync(this);
+            switch (getInterpreter().adaptivePredict(_input, 5, _ctx)) {
+                case 1:
+                    enterOuterAlt(_localctx, 1);
+                {
+                    setState(61);
+                    match(IDENTIFIER);
+                    setState(62);
+                    ((AssignmentContext) _localctx).assign = match(T__1);
+                    setState(63);
+                    assignment();
+                }
+                break;
+                case 2:
+                    enterOuterAlt(_localctx, 2);
+                {
                     setState(64);
+                    equality();
+                    setState(69);
                     _errHandler.sync(this);
                     _la = _input.LA(1);
+                    while (_la == T__4) {
+                        {
+                            {
+                                setState(65);
+                                ((AssignmentContext) _localctx).s5 = match(T__4);
+                                ((AssignmentContext) _localctx).op.add(((AssignmentContext) _localctx).s5);
+                                setState(66);
+                                equality();
+                            }
+                        }
+                        setState(71);
+                        _errHandler.sync(this);
+                        _la = _input.LA(1);
+                    }
                 }
+                break;
             }
         } catch (RecognitionException re) {
             _localctx.exception = re;
@@ -605,7 +682,7 @@ public class LoxParser extends Parser {
         public Token s21;
         public List<Token> op = new ArrayList<Token>();
         public Token s20;
-        public Token _tset107;
+        public Token _tset125;
 
         public List<ComparisonContext> comparison() {
             return getRuleContexts(ComparisonContext.class);
@@ -659,35 +736,35 @@ public class LoxParser extends Parser {
 
     public final EqualityContext equality() throws RecognitionException {
         EqualityContext _localctx = new EqualityContext(_ctx, getState());
-        enterRule(_localctx, 14, RULE_equality);
+        enterRule(_localctx, 16, RULE_equality);
         int _la;
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(65);
+                setState(74);
                 comparison();
-                setState(70);
+                setState(79);
                 _errHandler.sync(this);
                 _la = _input.LA(1);
                 while (_la == OP_EQUAL || _la == OP_INEQUAL) {
                     {
                         {
-                            setState(66);
-                            ((EqualityContext) _localctx)._tset107 = _input.LT(1);
+                            setState(75);
+                            ((EqualityContext) _localctx)._tset125 = _input.LT(1);
                             _la = _input.LA(1);
                             if (!(_la == OP_EQUAL || _la == OP_INEQUAL)) {
-                                ((EqualityContext) _localctx)._tset107 = (Token) _errHandler.recoverInline(this);
+                                ((EqualityContext) _localctx)._tset125 = (Token) _errHandler.recoverInline(this);
                             } else {
                                 if (_input.LA(1) == Token.EOF) matchedEOF = true;
                                 _errHandler.reportMatch(this);
                                 consume();
                             }
-                            ((EqualityContext) _localctx).op.add(((EqualityContext) _localctx)._tset107);
-                            setState(67);
+                            ((EqualityContext) _localctx).op.add(((EqualityContext) _localctx)._tset125);
+                            setState(76);
                             comparison();
                         }
                     }
-                    setState(72);
+                    setState(81);
                     _errHandler.sync(this);
                     _la = _input.LA(1);
                 }
@@ -708,7 +785,7 @@ public class LoxParser extends Parser {
         public Token s24;
         public Token s23;
         public Token s25;
-        public Token _tset130;
+        public Token _tset148;
 
         public List<TermContext> term() {
             return getRuleContexts(TermContext.class);
@@ -778,35 +855,35 @@ public class LoxParser extends Parser {
 
     public final ComparisonContext comparison() throws RecognitionException {
         ComparisonContext _localctx = new ComparisonContext(_ctx, getState());
-        enterRule(_localctx, 16, RULE_comparison);
+        enterRule(_localctx, 18, RULE_comparison);
         int _la;
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(73);
+                setState(82);
                 term();
-                setState(78);
+                setState(87);
                 _errHandler.sync(this);
                 _la = _input.LA(1);
                 while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OP_GREATER) | (1L << OP_LESS) | (1L << OP_GREATER_EQUAL) | (1L << OP_LESS_EQUAL))) != 0)) {
                     {
                         {
-                            setState(74);
-                            ((ComparisonContext) _localctx)._tset130 = _input.LT(1);
+                            setState(83);
+                            ((ComparisonContext) _localctx)._tset148 = _input.LT(1);
                             _la = _input.LA(1);
                             if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OP_GREATER) | (1L << OP_LESS) | (1L << OP_GREATER_EQUAL) | (1L << OP_LESS_EQUAL))) != 0))) {
-                                ((ComparisonContext) _localctx)._tset130 = (Token) _errHandler.recoverInline(this);
+                                ((ComparisonContext) _localctx)._tset148 = (Token) _errHandler.recoverInline(this);
                             } else {
                                 if (_input.LA(1) == Token.EOF) matchedEOF = true;
                                 _errHandler.reportMatch(this);
                                 consume();
                             }
-                            ((ComparisonContext) _localctx).op.add(((ComparisonContext) _localctx)._tset130);
-                            setState(75);
+                            ((ComparisonContext) _localctx).op.add(((ComparisonContext) _localctx)._tset148);
+                            setState(84);
                             term();
                         }
                     }
-                    setState(80);
+                    setState(89);
                     _errHandler.sync(this);
                     _la = _input.LA(1);
                 }
@@ -825,7 +902,7 @@ public class LoxParser extends Parser {
         public Token s17;
         public List<Token> op = new ArrayList<Token>();
         public Token s16;
-        public Token _tset162;
+        public Token _tset180;
 
         public List<FactorContext> factor() {
             return getRuleContexts(FactorContext.class);
@@ -879,35 +956,35 @@ public class LoxParser extends Parser {
 
     public final TermContext term() throws RecognitionException {
         TermContext _localctx = new TermContext(_ctx, getState());
-        enterRule(_localctx, 18, RULE_term);
+        enterRule(_localctx, 20, RULE_term);
         int _la;
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(81);
+                setState(90);
                 factor();
-                setState(86);
+                setState(95);
                 _errHandler.sync(this);
                 _la = _input.LA(1);
                 while (_la == OP_PLUS || _la == OP_MINUS) {
                     {
                         {
-                            setState(82);
-                            ((TermContext) _localctx)._tset162 = _input.LT(1);
+                            setState(91);
+                            ((TermContext) _localctx)._tset180 = _input.LT(1);
                             _la = _input.LA(1);
                             if (!(_la == OP_PLUS || _la == OP_MINUS)) {
-                                ((TermContext) _localctx)._tset162 = (Token) _errHandler.recoverInline(this);
+                                ((TermContext) _localctx)._tset180 = (Token) _errHandler.recoverInline(this);
                             } else {
                                 if (_input.LA(1) == Token.EOF) matchedEOF = true;
                                 _errHandler.reportMatch(this);
                                 consume();
                             }
-                            ((TermContext) _localctx).op.add(((TermContext) _localctx)._tset162);
-                            setState(83);
+                            ((TermContext) _localctx).op.add(((TermContext) _localctx)._tset180);
+                            setState(92);
                             factor();
                         }
                     }
-                    setState(88);
+                    setState(97);
                     _errHandler.sync(this);
                     _la = _input.LA(1);
                 }
@@ -926,7 +1003,7 @@ public class LoxParser extends Parser {
         public Token s19;
         public List<Token> op = new ArrayList<Token>();
         public Token s18;
-        public Token _tset185;
+        public Token _tset203;
 
         public List<UnaryContext> unary() {
             return getRuleContexts(UnaryContext.class);
@@ -980,35 +1057,35 @@ public class LoxParser extends Parser {
 
     public final FactorContext factor() throws RecognitionException {
         FactorContext _localctx = new FactorContext(_ctx, getState());
-        enterRule(_localctx, 20, RULE_factor);
+        enterRule(_localctx, 22, RULE_factor);
         int _la;
         try {
             enterOuterAlt(_localctx, 1);
             {
-                setState(89);
+                setState(98);
                 unary();
-                setState(94);
+                setState(103);
                 _errHandler.sync(this);
                 _la = _input.LA(1);
                 while (_la == OP_STAR || _la == OP_SLASH) {
                     {
                         {
-                            setState(90);
-                            ((FactorContext) _localctx)._tset185 = _input.LT(1);
+                            setState(99);
+                            ((FactorContext) _localctx)._tset203 = _input.LT(1);
                             _la = _input.LA(1);
                             if (!(_la == OP_STAR || _la == OP_SLASH)) {
-                                ((FactorContext) _localctx)._tset185 = (Token) _errHandler.recoverInline(this);
+                                ((FactorContext) _localctx)._tset203 = (Token) _errHandler.recoverInline(this);
                             } else {
                                 if (_input.LA(1) == Token.EOF) matchedEOF = true;
                                 _errHandler.reportMatch(this);
                                 consume();
                             }
-                            ((FactorContext) _localctx).op.add(((FactorContext) _localctx)._tset185);
-                            setState(91);
+                            ((FactorContext) _localctx).op.add(((FactorContext) _localctx)._tset203);
+                            setState(100);
                             unary();
                         }
                     }
-                    setState(96);
+                    setState(105);
                     _errHandler.sync(this);
                     _la = _input.LA(1);
                 }
@@ -1027,7 +1104,7 @@ public class LoxParser extends Parser {
         public Token s15;
         public List<Token> op = new ArrayList<Token>();
         public Token s17;
-        public Token _tset206;
+        public Token _tset224;
 
         public UnaryContext unary() {
             return getRuleContext(UnaryContext.class, 0);
@@ -1073,28 +1150,28 @@ public class LoxParser extends Parser {
 
     public final UnaryContext unary() throws RecognitionException {
         UnaryContext _localctx = new UnaryContext(_ctx, getState());
-        enterRule(_localctx, 22, RULE_unary);
+        enterRule(_localctx, 24, RULE_unary);
         int _la;
         try {
-            setState(100);
+            setState(109);
             _errHandler.sync(this);
             switch (_input.LA(1)) {
                 case OP_BANG:
                 case OP_MINUS:
                     enterOuterAlt(_localctx, 1);
                 {
-                    setState(97);
-                    ((UnaryContext) _localctx)._tset206 = _input.LT(1);
+                    setState(106);
+                    ((UnaryContext) _localctx)._tset224 = _input.LT(1);
                     _la = _input.LA(1);
                     if (!(_la == OP_BANG || _la == OP_MINUS)) {
-                        ((UnaryContext) _localctx)._tset206 = (Token) _errHandler.recoverInline(this);
+                        ((UnaryContext) _localctx)._tset224 = (Token) _errHandler.recoverInline(this);
                     } else {
                         if (_input.LA(1) == Token.EOF) matchedEOF = true;
                         _errHandler.reportMatch(this);
                         consume();
                     }
-                    ((UnaryContext) _localctx).op.add(((UnaryContext) _localctx)._tset206);
-                    setState(98);
+                    ((UnaryContext) _localctx).op.add(((UnaryContext) _localctx)._tset224);
+                    setState(107);
                     unary();
                 }
                 break;
@@ -1107,7 +1184,7 @@ public class LoxParser extends Parser {
                 case IDENTIFIER:
                     enterOuterAlt(_localctx, 2);
                 {
-                    setState(99);
+                    setState(108);
                     primary();
                 }
                 break;
@@ -1169,61 +1246,61 @@ public class LoxParser extends Parser {
 
     public final PrimaryContext primary() throws RecognitionException {
         PrimaryContext _localctx = new PrimaryContext(_ctx, getState());
-        enterRule(_localctx, 24, RULE_primary);
+        enterRule(_localctx, 26, RULE_primary);
         try {
-            setState(112);
+            setState(121);
             _errHandler.sync(this);
             switch (_input.LA(1)) {
                 case NUMBER:
                     enterOuterAlt(_localctx, 1);
                 {
-                    setState(102);
+                    setState(111);
                     match(NUMBER);
                 }
                 break;
                 case STRING:
                     enterOuterAlt(_localctx, 2);
                 {
-                    setState(103);
+                    setState(112);
                     match(STRING);
                 }
                 break;
                 case IDENTIFIER:
                     enterOuterAlt(_localctx, 3);
                 {
-                    setState(104);
+                    setState(113);
                     match(IDENTIFIER);
                 }
                 break;
                 case T__5:
                     enterOuterAlt(_localctx, 4);
                 {
-                    setState(105);
+                    setState(114);
                     match(T__5);
                 }
                 break;
                 case T__6:
                     enterOuterAlt(_localctx, 5);
                 {
-                    setState(106);
+                    setState(115);
                     match(T__6);
                 }
                 break;
                 case T__7:
                     enterOuterAlt(_localctx, 6);
                 {
-                    setState(107);
+                    setState(116);
                     match(T__7);
                 }
                 break;
                 case T__8:
                     enterOuterAlt(_localctx, 7);
                 {
-                    setState(108);
+                    setState(117);
                     match(T__8);
-                    setState(109);
+                    setState(118);
                     expression();
-                    setState(110);
+                    setState(119);
                     match(T__9);
                 }
                 break;
@@ -1241,35 +1318,37 @@ public class LoxParser extends Parser {
     }
 
     public static final String _serializedATN =
-            "\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\33u\4\2\t\2\4\3\t" +
+            "\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\33~\4\2\t\2\4\3\t" +
                     "\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4" +
-                    "\f\t\f\4\r\t\r\4\16\t\16\3\2\7\2\36\n\2\f\2\16\2!\13\2\3\2\3\2\3\3\3\3" +
-                    "\5\3\'\n\3\3\4\3\4\3\4\3\4\5\4-\n\4\3\4\3\4\3\5\3\5\5\5\63\n\5\3\6\3\6" +
-                    "\3\6\3\7\3\7\3\7\3\7\3\b\3\b\3\b\7\b?\n\b\f\b\16\bB\13\b\3\t\3\t\3\t\7" +
-                    "\tG\n\t\f\t\16\tJ\13\t\3\n\3\n\3\n\7\nO\n\n\f\n\16\nR\13\n\3\13\3\13\3" +
-                    "\13\7\13W\n\13\f\13\16\13Z\13\13\3\f\3\f\3\f\7\f_\n\f\f\f\16\fb\13\f\3" +
-                    "\r\3\r\3\r\5\rg\n\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16" +
-                    "\5\16s\n\16\3\16\2\2\17\2\4\6\b\n\f\16\20\22\24\26\30\32\2\7\3\2\26\27" +
-                    "\3\2\30\33\3\2\22\23\3\2\24\25\4\2\21\21\23\23\2w\2\37\3\2\2\2\4&\3\2" +
-                    "\2\2\6(\3\2\2\2\b\62\3\2\2\2\n\64\3\2\2\2\f\67\3\2\2\2\16;\3\2\2\2\20" +
-                    "C\3\2\2\2\22K\3\2\2\2\24S\3\2\2\2\26[\3\2\2\2\30f\3\2\2\2\32r\3\2\2\2" +
-                    "\34\36\5\4\3\2\35\34\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37 \3\2\2\2 \"" +
-                    "\3\2\2\2!\37\3\2\2\2\"#\7\2\2\3#\3\3\2\2\2$\'\5\6\4\2%\'\5\b\5\2&$\3\2" +
-                    "\2\2&%\3\2\2\2\'\5\3\2\2\2()\7\3\2\2),\7\17\2\2*+\7\4\2\2+-\5\16\b\2," +
-                    "*\3\2\2\2,-\3\2\2\2-.\3\2\2\2./\7\5\2\2/\7\3\2\2\2\60\63\5\n\6\2\61\63" +
-                    "\5\f\7\2\62\60\3\2\2\2\62\61\3\2\2\2\63\t\3\2\2\2\64\65\5\16\b\2\65\66" +
-                    "\7\5\2\2\66\13\3\2\2\2\678\7\6\2\289\5\16\b\29:\7\5\2\2:\r\3\2\2\2;@\5" +
-                    "\20\t\2<=\7\7\2\2=?\5\20\t\2><\3\2\2\2?B\3\2\2\2@>\3\2\2\2@A\3\2\2\2A" +
-                    "\17\3\2\2\2B@\3\2\2\2CH\5\22\n\2DE\t\2\2\2EG\5\22\n\2FD\3\2\2\2GJ\3\2" +
-                    "\2\2HF\3\2\2\2HI\3\2\2\2I\21\3\2\2\2JH\3\2\2\2KP\5\24\13\2LM\t\3\2\2M" +
-                    "O\5\24\13\2NL\3\2\2\2OR\3\2\2\2PN\3\2\2\2PQ\3\2\2\2Q\23\3\2\2\2RP\3\2" +
-                    "\2\2SX\5\26\f\2TU\t\4\2\2UW\5\26\f\2VT\3\2\2\2WZ\3\2\2\2XV\3\2\2\2XY\3" +
-                    "\2\2\2Y\25\3\2\2\2ZX\3\2\2\2[`\5\30\r\2\\]\t\5\2\2]_\5\30\r\2^\\\3\2\2" +
-                    "\2_b\3\2\2\2`^\3\2\2\2`a\3\2\2\2a\27\3\2\2\2b`\3\2\2\2cd\t\6\2\2dg\5\30" +
-                    "\r\2eg\5\32\16\2fc\3\2\2\2fe\3\2\2\2g\31\3\2\2\2hs\7\r\2\2is\7\16\2\2" +
-                    "js\7\17\2\2ks\7\b\2\2ls\7\t\2\2ms\7\n\2\2no\7\13\2\2op\5\16\b\2pq\7\f" +
-                    "\2\2qs\3\2\2\2rh\3\2\2\2ri\3\2\2\2rj\3\2\2\2rk\3\2\2\2rl\3\2\2\2rm\3\2" +
-                    "\2\2rn\3\2\2\2s\33\3\2\2\2\r\37&,\62@HPX`fr";
+                    "\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\3\2\7\2 \n\2\f\2\16\2#\13\2\3\2\3\2" +
+                    "\3\3\3\3\5\3)\n\3\3\4\3\4\3\4\3\4\5\4/\n\4\3\4\3\4\3\5\3\5\5\5\65\n\5" +
+                    "\3\6\3\6\3\6\3\7\3\7\3\7\3\7\3\b\3\b\3\t\3\t\3\t\3\t\3\t\3\t\7\tF\n\t" +
+                    "\f\t\16\tI\13\t\5\tK\n\t\3\n\3\n\3\n\7\nP\n\n\f\n\16\nS\13\n\3\13\3\13" +
+                    "\3\13\7\13X\n\13\f\13\16\13[\13\13\3\f\3\f\3\f\7\f`\n\f\f\f\16\fc\13\f" +
+                    "\3\r\3\r\3\r\7\rh\n\r\f\r\16\rk\13\r\3\16\3\16\3\16\5\16p\n\16\3\17\3" +
+                    "\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\5\17|\n\17\3\17\2\2\20\2\4" +
+                    "\6\b\n\f\16\20\22\24\26\30\32\34\2\7\3\2\26\27\3\2\30\33\3\2\22\23\3\2" +
+                    "\24\25\4\2\21\21\23\23\2\u0080\2!\3\2\2\2\4(\3\2\2\2\6*\3\2\2\2\b\64\3" +
+                    "\2\2\2\n\66\3\2\2\2\f9\3\2\2\2\16=\3\2\2\2\20J\3\2\2\2\22L\3\2\2\2\24" +
+                    "T\3\2\2\2\26\\\3\2\2\2\30d\3\2\2\2\32o\3\2\2\2\34{\3\2\2\2\36 \5\4\3\2" +
+                    "\37\36\3\2\2\2 #\3\2\2\2!\37\3\2\2\2!\"\3\2\2\2\"$\3\2\2\2#!\3\2\2\2$" +
+                    "%\7\2\2\3%\3\3\2\2\2&)\5\6\4\2\')\5\b\5\2(&\3\2\2\2(\'\3\2\2\2)\5\3\2" +
+                    "\2\2*+\7\3\2\2+.\7\17\2\2,-\7\4\2\2-/\5\16\b\2.,\3\2\2\2./\3\2\2\2/\60" +
+                    "\3\2\2\2\60\61\7\5\2\2\61\7\3\2\2\2\62\65\5\n\6\2\63\65\5\f\7\2\64\62" +
+                    "\3\2\2\2\64\63\3\2\2\2\65\t\3\2\2\2\66\67\5\16\b\2\678\7\5\2\28\13\3\2" +
+                    "\2\29:\7\6\2\2:;\5\16\b\2;<\7\5\2\2<\r\3\2\2\2=>\5\20\t\2>\17\3\2\2\2" +
+                    "?@\7\17\2\2@A\7\4\2\2AK\5\20\t\2BG\5\22\n\2CD\7\7\2\2DF\5\22\n\2EC\3\2" +
+                    "\2\2FI\3\2\2\2GE\3\2\2\2GH\3\2\2\2HK\3\2\2\2IG\3\2\2\2J?\3\2\2\2JB\3\2" +
+                    "\2\2K\21\3\2\2\2LQ\5\24\13\2MN\t\2\2\2NP\5\24\13\2OM\3\2\2\2PS\3\2\2\2" +
+                    "QO\3\2\2\2QR\3\2\2\2R\23\3\2\2\2SQ\3\2\2\2TY\5\26\f\2UV\t\3\2\2VX\5\26" +
+                    "\f\2WU\3\2\2\2X[\3\2\2\2YW\3\2\2\2YZ\3\2\2\2Z\25\3\2\2\2[Y\3\2\2\2\\a" +
+                    "\5\30\r\2]^\t\4\2\2^`\5\30\r\2_]\3\2\2\2`c\3\2\2\2a_\3\2\2\2ab\3\2\2\2" +
+                    "b\27\3\2\2\2ca\3\2\2\2di\5\32\16\2ef\t\5\2\2fh\5\32\16\2ge\3\2\2\2hk\3" +
+                    "\2\2\2ig\3\2\2\2ij\3\2\2\2j\31\3\2\2\2ki\3\2\2\2lm\t\6\2\2mp\5\32\16\2" +
+                    "np\5\34\17\2ol\3\2\2\2on\3\2\2\2p\33\3\2\2\2q|\7\r\2\2r|\7\16\2\2s|\7" +
+                    "\17\2\2t|\7\b\2\2u|\7\t\2\2v|\7\n\2\2wx\7\13\2\2xy\5\16\b\2yz\7\f\2\2" +
+                    "z|\3\2\2\2{q\3\2\2\2{r\3\2\2\2{s\3\2\2\2{t\3\2\2\2{u\3\2\2\2{v\3\2\2\2" +
+                    "{w\3\2\2\2|\35\3\2\2\2\16!(.\64GJQYaio{";
     public static final ATN _ATN =
             new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 

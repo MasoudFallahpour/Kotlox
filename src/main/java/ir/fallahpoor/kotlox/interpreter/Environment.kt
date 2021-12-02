@@ -9,15 +9,25 @@ class Environment {
 
     @Throws(RuntimeError::class)
     fun get(name: Token): Any? {
-        if (values.containsKey(name.lexeme)) {
-            return values[name.lexeme]
+        val variableName: String = name.lexeme
+        if (values.containsKey(variableName)) {
+            return values[variableName]
         } else {
-            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            throw RuntimeError(name, "Undefined variable '$variableName'.")
         }
     }
 
     fun define(name: String, value: Any?) {
         values[name] = value
+    }
+
+    fun assign(name: Token, value: Any?) {
+        val variableName: String = name.lexeme
+        if (values.containsKey(variableName)) {
+            values[variableName] = value
+        } else {
+            throw RuntimeError(name, "Undefined variable '$variableName'.")
+        }
     }
 
 }

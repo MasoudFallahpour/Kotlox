@@ -244,6 +244,29 @@ class ParserTest {
 
     }
 
+    @Test
+    fun test14() {
+
+        // Given
+        val source =
+            """var a = 1;
+               var b = 2;
+               a = b;
+               b = 10.2 / (3 + 4), 5;
+               print a;
+               print b;
+             """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun parseSource(source: String): List<Stmt> {
         val parser = createParser(source)
         return parser.parse()

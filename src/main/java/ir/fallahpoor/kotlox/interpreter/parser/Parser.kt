@@ -17,7 +17,8 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * statement   -> exprStmt | printStmt
  * exprStmt    -> expression ";"
  * printStmt   -> "print" expression ";"
- * expression  -> equality ("," equality)*
+ * expression  -> assignment
+ * assignment  -> IDENTIFIER "=" assignment | equality ("," equality)*
  * equality    -> comparison ( ( "!=" | "==" ) comparison )*
  * comparison  -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
  * term        -> factor ( ( "-" | "+" ) factor )*
@@ -85,12 +86,25 @@ class Parser(
         return Stmt.Expression(expr)
     }
 
-    private fun expression(): Expr {
+    private fun expression(): Expr = assignment()
+
+    private fun assignment(): Expr {
         var expr: Expr = equality()
-        while (tokens.getNextTokenIfItHasType(TokenType.COMMA)) {
-            val operator: Token = tokens.getPreviousToken()
-            val right: Expr = equality()
-            expr = Expr.Binary(expr, operator, right)
+        if (tokens.getNextTokenIfItHasType(TokenType.EQUAL)) {
+            val equals: Token = tokens.getPreviousToken()
+            val value: Expr = assignment()
+            if (expr is Expr.Variable) {
+                val name = expr.name
+                expr = Expr.Assign(name, value)
+            } else {
+                error(equals, "Invalid assignment target.")
+            }
+        } else {
+            while (tokens.getNextTokenIfItHasType(TokenType.COMMA)) {
+                val operator: Token = tokens.getPreviousToken()
+                val right: Expr = equality()
+                expr = Expr.Binary(expr, operator, right)
+            }
         }
         return expr
     }

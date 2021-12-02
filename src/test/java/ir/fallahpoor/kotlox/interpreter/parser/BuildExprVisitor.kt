@@ -16,23 +16,38 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
         private val STRING_WITH_DOUBLE_QUOTES_REGEX = "\"[^\"]*\"".toRegex()
     }
 
-    override fun visitExpression(ctx: LoxParser.ExpressionContext): Expr {
-        var expr: Expr = visitEquality(ctx.equality(0))
-        for (i in 0..ctx.op.lastIndex) {
-            expr = createEqualityExpr(
-                currentExpr = expr,
-                equalityContext = ctx.equality(i + 1)
+    override fun visitExpression(ctx: LoxParser.ExpressionContext): Expr =
+        visitAssignment(ctx.assignment())
+
+    override fun visitAssignment(ctx: LoxParser.AssignmentContext): Expr =
+        if (ctx.assign != null) {
+            val value: Expr = visitAssignment(ctx.assignment())
+            val name = Token(
+                TokenType.IDENTIFIER,
+                ctx.IDENTIFIER().symbol.text,
+                null,
+                ctx.IDENTIFIER().symbol.line
             )
+            Expr.Assign(name, value)
+        } else {
+            var expr: Expr = visitEquality(ctx.equality(0))
+            for (i in 0..ctx.op.lastIndex) {
+                expr = createEqualityExpr(
+                    currentExpr = expr,
+                    ctx.op[i],
+                    equalityContext = ctx.equality(i + 1)
+                )
+            }
+            expr
         }
-        return expr
-    }
 
     private fun createEqualityExpr(
         currentExpr: Expr,
+        token: org.antlr.v4.runtime.Token,
         equalityContext: LoxParser.EqualityContext
     ): Expr = Expr.Binary(
         left = currentExpr,
-        operator = Token(TokenType.COMMA, ",", null, 1),
+        operator = Token(TokenType.COMMA, ",", null, token.line),
         right = visitEquality(equalityContext)
     )
 

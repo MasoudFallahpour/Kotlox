@@ -289,6 +289,31 @@ class InterpreterTest {
 
     }
 
+    @Test
+    fun test15() {
+
+        // Given
+        val source =
+            """var a = 1;
+               var b = 2;
+               a = b;
+               b = 10.2 / (3 + 4), 5;
+               print a;
+               print b;
+             """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedPrinter = TestPrinter()
+        interpretSourceWithAntlr(source, expectedPrinter)
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun interpretSource(source: String, printer: TestPrinter) {
         val statements: List<Stmt> = parseSource(source)
         if (statements.isNotEmpty()) {

@@ -4,7 +4,6 @@ import ir.fallahpoor.kotlox.interpreter.*
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
-
 class Interpreter(
     private val errorReporter: ErrorReporter,
     private val printer: Printer
@@ -44,6 +43,12 @@ class Interpreter(
             }
             else -> any.toString()
         }
+
+    override fun visitAssignExpr(expr: Expr.Assign): Any? {
+        val value = evaluate(expr.value)
+        environment.assign(expr.name, value)
+        return value
+    }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
 

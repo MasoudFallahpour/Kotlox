@@ -142,6 +142,24 @@ public class LoxBaseListener implements LoxListener {
      * <p>The default implementation does nothing.</p>
      */
     @Override
+    public void enterAssignment(LoxParser.AssignmentContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void exitAssignment(LoxParser.AssignmentContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
     public void enterEquality(LoxParser.EqualityContext ctx) {
     }
 

@@ -20,7 +20,11 @@ printStmt
     : 'print' expression ';' ;
 
 expression
-    : equality (op+=',' equality)* ;
+    : assignment ;
+
+assignment
+    : IDENTIFIER assign='=' assignment
+    | equality (op+=',' equality)* ;
 
 equality
     : comparison (op+=('!=' | '==') comparison)* ;

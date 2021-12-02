@@ -106,6 +106,20 @@ public interface LoxListener extends ParseTreeListener {
     void exitExpression(LoxParser.ExpressionContext ctx);
 
     /**
+     * Enter a parse tree produced by {@link LoxParser#assignment}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterAssignment(LoxParser.AssignmentContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#assignment}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitAssignment(LoxParser.AssignmentContext ctx);
+
+    /**
      * Enter a parse tree produced by {@link LoxParser#equality}.
      *
      * @param ctx the parse tree
