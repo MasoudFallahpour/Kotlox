@@ -77,7 +77,19 @@ class Lox(private val commandLineArgs: Array<String>) {
             println()
             return
         }
-        interpreter.interpret(statements)
+        if (statements.isEmpty()) {
+            return
+        } else if (statements.size == 1) {
+            val statement = statements[0]
+            if (statement is Stmt.Expression) {
+                val printStmt = Stmt.Print(statement.expression)
+                interpreter.interpret(listOf(printStmt))
+            } else {
+                interpreter.interpret(statements)
+            }
+        } else {
+            interpreter.interpret(statements)
+        }
         if (errorReporter.hadRuntimeError) {
             println()
         }
