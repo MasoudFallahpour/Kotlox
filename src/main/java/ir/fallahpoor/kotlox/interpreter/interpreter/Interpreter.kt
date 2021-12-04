@@ -165,12 +165,12 @@ class Interpreter(
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {
-        val value: Any? = if (stmt.initializer != null) {
-            evaluate(stmt.initializer)
+        if (stmt.initializer != null) {
+            val value: Any? = evaluate(stmt.initializer)
+            environment.define(stmt.name.lexeme, value)
         } else {
-            null
+            environment.define(stmt.name.lexeme)
         }
-        environment.define(stmt.name.lexeme, value)
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? = environment.get(expr.name)
