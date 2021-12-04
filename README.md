@@ -39,7 +39,9 @@ Chapter 6: Parsing Expressions (done)
 
 Chapter 7: Evaluating Expressions (done)
 
-Chapter 8: Statements and State (I'm here!)
+Chapter 8: Statements and State (done)
+
+Chapter 9: Control Flow (I'm here!)
 
 Unit Tests
 -
