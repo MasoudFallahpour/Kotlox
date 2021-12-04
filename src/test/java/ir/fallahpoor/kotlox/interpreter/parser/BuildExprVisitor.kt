@@ -30,16 +30,60 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
             )
             Expr.Assign(name, value)
         } else {
-            var expr: Expr = visitEquality(ctx.equality(0))
+            var expr: Expr = visitLogicOr(ctx.logicOr(0))
             for (i in 0..ctx.op.lastIndex) {
-                expr = createEqualityExpr(
+                expr = createOrExpr(
                     currentExpr = expr,
                     ctx.op[i],
-                    equalityContext = ctx.equality(i + 1)
+                    logicOrContext = ctx.logicOr(i + 1)
                 )
             }
             expr
         }
+
+    private fun createOrExpr(
+        currentExpr: Expr,
+        token: org.antlr.v4.runtime.Token,
+        logicOrContext: LoxParser.LogicOrContext
+    ): Expr = Expr.Binary(
+        left = currentExpr,
+        operator = Token(TokenType.COMMA, ",", null, token.line),
+        right = visitLogicOr(logicOrContext)
+    )
+
+    override fun visitLogicOr(ctx: LoxParser.LogicOrContext): Expr {
+        var expr: Expr = visitLogicAnd(ctx.logicAnd(0))
+        for (i in 0..ctx.or.lastIndex) {
+            expr = createAndExpr(
+                currentExpr = expr,
+                token = ctx.or[i],
+                logicAndContext = ctx.logicAnd(i + 1)
+            )
+        }
+        return expr
+    }
+
+    private fun createAndExpr(
+        currentExpr: Expr,
+        token: org.antlr.v4.runtime.Token,
+        logicAndContext: LoxParser.LogicAndContext
+    ): Expr = Expr.Binary(
+        left = currentExpr,
+        operator = Token(TokenType.AND, "and", null, token.line),
+        right = visitLogicAnd(logicAndContext)
+    )
+
+    override fun visitLogicAnd(ctx: LoxParser.LogicAndContext): Expr {
+        var expr: Expr = visitEquality(ctx.equality(0))
+        for (i in 0..ctx.and.lastIndex) {
+            expr = createEqualityExpr(
+                currentExpr = expr,
+                token = ctx.and[i],
+                equalityContext = ctx.equality(i + 1)
+            )
+        }
+        return expr
+    }
 
     private fun createEqualityExpr(
         currentExpr: Expr,
@@ -47,7 +91,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
         equalityContext: LoxParser.EqualityContext
     ): Expr = Expr.Binary(
         left = currentExpr,
-        operator = Token(TokenType.COMMA, ",", null, token.line),
+        operator = Token(TokenType.OR, ",", null, token.line),
         right = visitEquality(equalityContext)
     )
 

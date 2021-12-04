@@ -73,6 +73,17 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override
+    public T visitIfStmt(LoxParser.IfStmtContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
     public T visitPrintStmt(LoxParser.PrintStmtContext ctx) {
         return visitChildren(ctx);
     }
@@ -107,6 +118,28 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      */
     @Override
     public T visitAssignment(LoxParser.AssignmentContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitLogicOr(LoxParser.LogicOrContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitLogicAnd(LoxParser.LogicAndContext ctx) {
         return visitChildren(ctx);
     }
 

@@ -41,16 +41,28 @@ class InterpretStmtVisitor(
         environment.define(ctx.IDENTIFIER().symbol.text, value)
     }
 
-    // Evaluates rule: statement -> exprStmt | printStmt | block
+    // Evaluates rule: statement -> exprStmt | ifStmt | printStmt | block
     override fun visitStatement(ctx: LoxParser.StatementContext) {
-        if (ctx.exprStmt() != null) {
+        if (ctx.ifStmt() != null) {
+            visitIfStmt(ctx.ifStmt())
+        } else if (ctx.exprStmt() != null) {
             visitExprStmt(ctx.exprStmt())
         } else if (ctx.printStmt() != null) {
             visitPrintStmt(ctx.printStmt())
         } else if (ctx.block() != null) {
             visitBlock(ctx.block())
-        } else
+        } else {
             throw RuntimeException()
+        }
+    }
+
+    override fun visitIfStmt(ctx: LoxParser.IfStmtContext) {
+        val condition: Any? = interpretExprVisitor.visitExpression(ctx.expression())
+        if (isTruthy(condition)) {
+            visitStatement(ctx.thenBranch)
+        } else if (ctx.elseBranch != null) {
+            visitStatement(ctx.elseBranch)
+        }
     }
 
     // Evaluates rule: printStmt -> "print" expression ";"
@@ -83,6 +95,14 @@ class InterpretStmtVisitor(
             environment = previousEnvironment
         }
     }
+
+    // 'false' and 'nil' are falsey, and everything else is truthy.
+    private fun isTruthy(any: Any?): Boolean =
+        when (any) {
+            null -> false
+            is Boolean -> any
+            else -> true
+        }
 
     private fun stringify(any: Any?): String =
         when (any) {

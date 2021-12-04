@@ -15,7 +15,7 @@ class InterpretExprVisitor(
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Any? =
         visitAssignment(ctx.assignment())
 
-    // Evaluates rule: IDENTIFIER "=" assignment | equality ("," equality)*
+    // Evaluates rule: assignment  -> IDENTIFIER "=" assignment | logicOr ("," logicOr)*
     override fun visitAssignment(ctx: LoxParser.AssignmentContext): Any? {
         if (ctx.assign != null) {
             val value = visitAssignment(ctx.assignment())
@@ -28,13 +28,69 @@ class InterpretExprVisitor(
             environment.assign(token, value)
             return value
         } else {
-            var currentValue: Any? = visitEquality(ctx.equality(0))
+            var currentValue: Any? = visitLogicOr(ctx.logicOr(0))
             for (i in 0..ctx.op.lastIndex) {
-                currentValue = visitEquality(ctx.equality(i + 1))
+                currentValue = visitLogicOr(ctx.logicOr(i + 1))
             }
             return currentValue
         }
     }
+
+    // Evaluates rule: logicOr -> logicAnd ("or" logicAnd)*
+    override fun visitLogicOr(ctx: LoxParser.LogicOrContext): Any? {
+        var currentValue: Any? = visitLogicAnd(ctx.logicAnd(0))
+        if (isTruthy(currentValue)) {
+            return currentValue
+        }
+        for (i in 0..ctx.or.lastIndex) {
+            currentValue = evaluateOr(
+                currentValue = currentValue,
+                logicAndContext = ctx.logicAnd(i + 1)
+            )
+            if (isTruthy(currentValue)) {
+                return currentValue
+            }
+        }
+        return currentValue
+    }
+
+    private fun evaluateOr(
+        currentValue: Any?,
+        logicAndContext: LoxParser.LogicAndContext
+    ): Any? =
+        if (isTruthy(currentValue)) {
+            currentValue
+        } else {
+            visitLogicAnd(logicAndContext)
+        }
+
+    // Evaluates rule: logicAnd -> equality ("and" equality)*
+    override fun visitLogicAnd(ctx: LoxParser.LogicAndContext): Any? {
+        var currentValue: Any? = visitEquality(ctx.equality(0))
+        if (!isTruthy(currentValue)) {
+            return currentValue
+        }
+        for (i in 0..ctx.and.lastIndex) {
+            currentValue = evaluateAnd(
+                currentValue = currentValue,
+                equalityContext = ctx.equality(i + 1)
+            )
+            if (isTruthy(currentValue)) {
+                return currentValue
+            }
+        }
+        return currentValue
+    }
+
+    private fun evaluateAnd(
+        currentValue: Any?,
+        equalityContext: LoxParser.EqualityContext
+    ): Any? =
+        if (!isTruthy(currentValue)) {
+            currentValue
+        } else {
+            visitEquality(equalityContext)
+        }
 
     // Evaluates rule: equality → comparison ( ( "!=" | "==" ) comparison )*
     override fun visitEquality(ctx: LoxParser.EqualityContext): Any? {

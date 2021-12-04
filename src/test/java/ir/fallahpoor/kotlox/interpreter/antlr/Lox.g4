@@ -11,10 +11,13 @@ varDecl
     : 'var' IDENTIFIER ('=' expression)? ';' ;
 
 statement
-    : exprStmt | printStmt | block ;
+    : exprStmt | ifStmt |printStmt | block ;
 
 exprStmt
     : expression ';' ;
+
+ifStmt
+    : 'if' '(' expression ')' thenBranch=statement ('else' elseBranch=statement)? ;
 
 printStmt
     : 'print' expression ';' ;
@@ -27,7 +30,13 @@ expression
 
 assignment
     : IDENTIFIER assign='=' assignment
-    | equality (op+=',' equality)* ;
+    | logicOr (op+=',' logicOr)* ;
+
+logicOr
+    : logicAnd (or+='or' logicAnd)* ;
+
+logicAnd
+    : equality (and+='and' equality)* ;
 
 equality
     : comparison (op+=('!=' | '==') comparison)* ;

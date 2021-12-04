@@ -78,6 +78,20 @@ public interface LoxListener extends ParseTreeListener {
     void exitExprStmt(LoxParser.ExprStmtContext ctx);
 
     /**
+     * Enter a parse tree produced by {@link LoxParser#ifStmt}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterIfStmt(LoxParser.IfStmtContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#ifStmt}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitIfStmt(LoxParser.IfStmtContext ctx);
+
+    /**
      * Enter a parse tree produced by {@link LoxParser#printStmt}.
      *
      * @param ctx the parse tree
@@ -132,6 +146,34 @@ public interface LoxListener extends ParseTreeListener {
      * @param ctx the parse tree
      */
     void exitAssignment(LoxParser.AssignmentContext ctx);
+
+    /**
+     * Enter a parse tree produced by {@link LoxParser#logicOr}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterLogicOr(LoxParser.LogicOrContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#logicOr}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitLogicOr(LoxParser.LogicOrContext ctx);
+
+    /**
+     * Enter a parse tree produced by {@link LoxParser#logicAnd}.
+     *
+     * @param ctx the parse tree
+     */
+    void enterLogicAnd(LoxParser.LogicAndContext ctx);
+
+    /**
+     * Exit a parse tree produced by {@link LoxParser#logicAnd}.
+     *
+     * @param ctx the parse tree
+     */
+    void exitLogicAnd(LoxParser.LogicAndContext ctx);
 
     /**
      * Enter a parse tree produced by {@link LoxParser#equality}.

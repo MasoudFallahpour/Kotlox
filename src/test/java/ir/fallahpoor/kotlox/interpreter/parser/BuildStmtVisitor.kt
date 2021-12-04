@@ -17,7 +17,7 @@ class BuildStmtVisitor(
         } else {
             val statements = mutableListOf<Stmt>()
             for (i in 0..ctx.declaration().lastIndex) {
-                statements.addAll(visitDeclaration(ctx.declaration(i)))
+                statements += visitDeclaration(ctx.declaration(i))
             }
             statements
         }
@@ -43,19 +43,28 @@ class BuildStmtVisitor(
     }
 
     override fun visitStatement(ctx: LoxParser.StatementContext): List<Stmt> =
-        if (ctx.exprStmt() != null) {
-            visitExprStmt(ctx.exprStmt())
+        if (ctx.ifStmt() != null) {
+            visitIfStmt(ctx.ifStmt())
         } else if (ctx.printStmt() != null) {
             visitPrintStmt(ctx.printStmt())
         } else if (ctx.block() != null) {
             visitBlock(ctx.block())
+        } else if (ctx.exprStmt() != null) {
+            visitExprStmt(ctx.exprStmt())
         } else {
             throw RuntimeException()
         }
 
-    override fun visitExprStmt(ctx: LoxParser.ExprStmtContext): List<Stmt> {
-        val expr: Expr = buildExprVisitor.visitExpression(ctx.expression())
-        return listOf(Stmt.Expression(expr))
+    override fun visitIfStmt(ctx: LoxParser.IfStmtContext): List<Stmt> {
+        val condition: Expr = buildExprVisitor.visitExpression(ctx.expression())
+        val thenBranch: List<Stmt> = visitStatement(ctx.thenBranch)
+        val ifStmt = if (ctx.elseBranch != null) {
+            val elseBranch: List<Stmt> = visitStatement(ctx.elseBranch)
+            Stmt.If(condition, thenBranch[0], elseBranch[0])
+        } else {
+            Stmt.If(condition, thenBranch[0], null)
+        }
+        return listOf(ifStmt)
     }
 
     override fun visitPrintStmt(ctx: LoxParser.PrintStmtContext): List<Stmt> {
@@ -65,12 +74,17 @@ class BuildStmtVisitor(
 
     override fun visitBlock(ctx: LoxParser.BlockContext): List<Stmt> {
         val statements = mutableListOf<Stmt>()
-        if (ctx.declaration() != null && ctx.declaration().isNotEmpty()) {
+        if (!ctx.declaration().isNullOrEmpty()) {
             ctx.declaration().forEach {
-                statements.addAll(visitDeclaration(it))
+                statements += visitDeclaration(it)
             }
         }
         return listOf(Stmt.Block(statements))
+    }
+
+    override fun visitExprStmt(ctx: LoxParser.ExprStmtContext): List<Stmt> {
+        val expr: Expr = buildExprVisitor.visitExpression(ctx.expression())
+        return listOf(Stmt.Expression(expr))
     }
 
 }

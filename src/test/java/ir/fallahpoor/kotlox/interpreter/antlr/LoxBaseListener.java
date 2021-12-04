@@ -106,6 +106,24 @@ public class LoxBaseListener implements LoxListener {
      * <p>The default implementation does nothing.</p>
      */
     @Override
+    public void enterIfStmt(LoxParser.IfStmtContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void exitIfStmt(LoxParser.IfStmtContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
     public void enterPrintStmt(LoxParser.PrintStmtContext ctx) {
     }
 
@@ -170,6 +188,42 @@ public class LoxBaseListener implements LoxListener {
      */
     @Override
     public void exitAssignment(LoxParser.AssignmentContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void enterLogicOr(LoxParser.LogicOrContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void exitLogicOr(LoxParser.LogicOrContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void enterLogicAnd(LoxParser.LogicAndContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
+     */
+    @Override
+    public void exitLogicAnd(LoxParser.LogicAndContext ctx) {
     }
 
     /**

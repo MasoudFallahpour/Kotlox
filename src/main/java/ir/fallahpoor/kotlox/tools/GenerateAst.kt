@@ -12,10 +12,11 @@ fun main() {
         outputDir,
         "Expr",
         listOf(
-            "Assign   -> name: Token, value: Expr?",
+            "Assign   -> name: Token, value: Expr",
             "Binary   -> left: Expr, operator: Token, right: Expr",
             "Grouping -> expression: Expr",
             "Literal  -> value: Any?",
+            "Logical  -> left: Expr, operator: Token, right: Expr",
             "Unary    -> operator: Token, right: Expr",
             "Variable -> name: Token"
         )
@@ -26,6 +27,7 @@ fun main() {
         listOf(
             "Block      -> statements: List<Stmt>",
             "Expression -> expression: Expr",
+            "If         -> condition: Expr, thenBranch: Stmt, elseBranch: Stmt?",
             "Print      -> expression: Expr",
             "Var        -> name: Token, initializer: Expr?"
         )

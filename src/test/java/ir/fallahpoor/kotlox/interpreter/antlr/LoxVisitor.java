@@ -51,6 +51,14 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitExprStmt(LoxParser.ExprStmtContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link LoxParser#ifStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitIfStmt(LoxParser.IfStmtContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link LoxParser#printStmt}.
      *
      * @param ctx the parse tree
@@ -81,6 +89,22 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
      * @return the visitor result
      */
     T visitAssignment(LoxParser.AssignmentContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#logicOr}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitLogicOr(LoxParser.LogicOrContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#logicAnd}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitLogicAnd(LoxParser.LogicAndContext ctx);
 
     /**
      * Visit a parse tree produced by {@link LoxParser#equality}.

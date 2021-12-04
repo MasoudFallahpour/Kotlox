@@ -2,6 +2,7 @@ package ir.fallahpoor.kotlox.interpreter.parser
 
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Expr
+import ir.fallahpoor.kotlox.interpreter.Expr.Logical
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
@@ -10,16 +11,18 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * This class implements a recursive descent parser for the following grammar. The grammar is
  * unambiguous and has no left-recursive rules. Otherwise, it would not be possible to implement
  * such a parser.
- *
  * program     -> declaration* EOF
  * declaration -> varDecl | statement
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
- * statement   -> exprStmt | printStmt | block
- * block       -> "{" declaration* "}"
+ * statement   -> exprStmt | ifStmt | printStmt | block
  * exprStmt    -> expression ";"
+ * ifStmt      -> "if" "(" expression ")" statement ("else" statement)?
  * printStmt   -> "print" expression ";"
+ * block       -> "{" declaration* "}"
  * expression  -> assignment
- * assignment  -> IDENTIFIER "=" assignment | equality ("," equality)*
+ * assignment  -> IDENTIFIER "=" assignment | logicOr ("," logicOr)*
+ * logicOr     -> logicAnd ("or" logicAnd)*
+ * logicAnd    -> equality ("and" equality)*
  * equality    -> comparison ( ( "!=" | "==" ) comparison )*
  * comparison  -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
  * term        -> factor ( ( "-" | "+" ) factor )*
@@ -39,7 +42,7 @@ class Parser(
         while (!tokens.isAtEnd()) {
             val stmt: Stmt? = declaration()
             if (stmt != null) {
-                statements.add(stmt)
+                statements += stmt
             }
         }
         return statements
@@ -69,13 +72,28 @@ class Parser(
     }
 
     private fun statement(): Stmt =
-        if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
+        if (tokens.getNextTokenIfItHasType(TokenType.IF)) {
+            ifStatement()
+        } else if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
             printStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_BRACE)) {
             Stmt.Block(block())
         } else {
             expressionStatement()
         }
+
+    private fun ifStatement(): Stmt {
+        consumeTokenOrThrowError(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        val condition = expression()
+        consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+        val thenBranch = statement()
+        val elseBranch: Stmt? = if (tokens.getNextTokenIfItHasType(TokenType.ELSE)) {
+            statement()
+        } else {
+            null
+        }
+        return Stmt.If(condition, thenBranch, elseBranch)
+    }
 
     private fun printStatement(): Stmt {
         val value = expression()
@@ -88,7 +106,7 @@ class Parser(
         while (!tokens.nextTokenHasType(TokenType.RIGHT_BRACE) && !tokens.isAtEnd()) {
             val declaration = declaration()
             if (declaration != null) {
-                statements.add(declaration)
+                statements += declaration
             }
         }
         consumeTokenOrThrowError(TokenType.RIGHT_BRACE, "Expect '}' after block.")
@@ -104,7 +122,7 @@ class Parser(
     private fun expression(): Expr = assignment()
 
     private fun assignment(): Expr {
-        var expr: Expr = equality()
+        var expr: Expr = or()
         if (tokens.getNextTokenIfItHasType(TokenType.EQUAL)) {
             val equals: Token = tokens.getPreviousToken()
             val value: Expr = assignment()
@@ -117,9 +135,29 @@ class Parser(
         } else {
             while (tokens.getNextTokenIfItHasType(TokenType.COMMA)) {
                 val operator: Token = tokens.getPreviousToken()
-                val right: Expr = equality()
+                val right: Expr = or()
                 expr = Expr.Binary(expr, operator, right)
             }
+        }
+        return expr
+    }
+
+    private fun or(): Expr {
+        var expr: Expr = and()
+        while (tokens.getNextTokenIfItHasType(TokenType.OR)) {
+            val operator: Token = tokens.getPreviousToken()
+            val right: Expr = and()
+            expr = Logical(expr, operator, right)
+        }
+        return expr
+    }
+
+    private fun and(): Expr {
+        var expr = equality()
+        while (tokens.getNextTokenIfItHasType(TokenType.AND)) {
+            val operator: Token = tokens.getPreviousToken()
+            val right = equality()
+            expr = Logical(expr, operator, right)
         }
         return expr
     }

@@ -1,6 +1,7 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
 import ir.fallahpoor.kotlox.interpreter.*
+import ir.fallahpoor.kotlox.interpreter.Expr.Logical
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
@@ -143,6 +144,16 @@ class Interpreter(
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? = expr.value
 
+    override fun visitLogicalExpr(expr: Logical): Any? {
+        val left: Any? = evaluate(expr.left)
+        if (expr.operator.type == TokenType.OR) {
+            if (isTruthy(left)) return left
+        } else {
+            if (!isTruthy(left)) return left
+        }
+        return evaluate(expr.right)
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary): Any? {
         val right: Any? = evaluate(expr.right)
         return when (expr.operator.type) {
@@ -157,6 +168,14 @@ class Interpreter(
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
+    }
+
+    override fun visitIfStmt(stmt: Stmt.If) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch)
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch)
+        }
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print) {

@@ -38,7 +38,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -54,7 +54,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -70,7 +70,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -86,7 +86,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -102,7 +102,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -118,7 +118,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -134,7 +134,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -150,7 +150,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -166,7 +166,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -182,7 +182,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -198,7 +198,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -218,7 +218,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -238,7 +238,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -261,7 +261,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -282,7 +282,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -318,7 +318,39 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = getExpectedStatements(source)
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun test17() {
+
+        // Given
+        val source =
+            """if (true) if (false) print "bad"; else print "good";
+               if (false) if (true) print "bad"; else print "bad";
+               if (true) print "good"; else print "bad";
+               if (false) print "bad"; else print "good";
+               if (false) nil; else { print "block"; }
+               if (true) print "good";
+               if (false) print "bad";
+               if (true) { print "block"; }
+               var a = false;
+               if (a = true) print a;
+               if (false) print "bad"; else print "false";
+               if (nil) print "bad"; else print "nil";
+               if (true) print true;
+               if (0) print 0;
+               if ("") print "empty";
+             """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt>? = parserSourceWithAntlr(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -335,7 +367,7 @@ class ParserTest {
         return Parser(Tokens(tokens), errorReporter)
     }
 
-    private fun getExpectedStatements(source: String): List<Stmt>? {
+    private fun parserSourceWithAntlr(source: String): List<Stmt>? {
         val inputStream = CharStreams.fromStream(ByteArrayInputStream(source.toByteArray()))
         val loxLexer = LoxLexer(inputStream)
         val tokenStream = CommonTokenStream(loxLexer)
