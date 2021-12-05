@@ -18,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner
 // TODO add tests for cases when Evaluator catches a runtime error.
 
 @RunWith(MockitoJUnitRunner::class)
-class InterpreterIfTest {
+class IfTest {
 
     @Mock
     private lateinit var errorReporter: ErrorReporter
