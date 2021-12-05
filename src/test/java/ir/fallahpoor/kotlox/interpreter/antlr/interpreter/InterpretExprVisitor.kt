@@ -75,7 +75,7 @@ class InterpretExprVisitor(
                 currentValue = currentValue,
                 equalityContext = ctx.equality(i + 1)
             )
-            if (isTruthy(currentValue)) {
+            if (!isTruthy(currentValue)) {
                 return currentValue
             }
         }

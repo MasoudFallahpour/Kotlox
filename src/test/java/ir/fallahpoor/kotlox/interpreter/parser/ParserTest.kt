@@ -283,7 +283,7 @@ class ParserTest {
     }
 
     @Test
-    fun test16() {
+    fun testBlock() {
 
         // Given
         val source =
@@ -338,6 +338,27 @@ class ParserTest {
                if (true) print true;
                if (0) print 0;
                if ("") print "empty";
+             """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testLogicalOperators() {
+
+        // Given
+        val source =
+            """print true and 1;
+               print false and 1;
+               print true or 1;
+               print false or 1;
              """
 
         // When

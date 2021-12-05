@@ -224,7 +224,7 @@ class InterpreterTest {
     }
 
     @Test
-    fun test12() {
+    fun testStringConcatenation() {
 
         // Given
         val source = "print \"Hello\" + \" World!\";"
@@ -311,7 +311,7 @@ class InterpreterTest {
     }
 
     @Test
-    fun test16() {
+    fun testBlock() {
 
         // Given
         val source =
