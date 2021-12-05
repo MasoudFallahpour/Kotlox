@@ -16,6 +16,8 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 // TODO add tests for cases when Evaluator catches a runtime error.
+// TODO Add separate test classes for different language constructs like what we have
+//  done for "If" statements.
 
 @RunWith(MockitoJUnitRunner::class)
 class InterpreterTest {
