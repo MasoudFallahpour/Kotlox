@@ -67,9 +67,9 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
         currentExpr: Expr,
         token: org.antlr.v4.runtime.Token,
         logicAndContext: LoxParser.LogicAndContext
-    ): Expr = Expr.Binary(
+    ): Expr = Expr.Logical(
         left = currentExpr,
-        operator = Token(TokenType.AND, "and", null, token.line),
+        operator = Token(TokenType.OR, "or", null, token.line),
         right = visitLogicAnd(logicAndContext)
     )
 
@@ -89,9 +89,9 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
         currentExpr: Expr,
         token: org.antlr.v4.runtime.Token,
         equalityContext: LoxParser.EqualityContext
-    ): Expr = Expr.Binary(
+    ): Expr = Expr.Logical(
         left = currentExpr,
-        operator = Token(TokenType.OR, ",", null, token.line),
+        operator = Token(TokenType.AND, "and", null, token.line),
         right = visitEquality(equalityContext)
     )
 
