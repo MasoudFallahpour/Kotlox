@@ -1,25 +1,18 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
 import com.google.common.truth.Truth
-import ir.fallahpoor.kotlox.interpreter.Environment
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.TestPrinter
-import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
-import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
-import org.antlr.v4.runtime.BailErrorStrategy
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import java.io.ByteArrayInputStream
 
 // TODO add tests for cases when Evaluator catches a runtime error.
 
@@ -45,7 +38,7 @@ class InterpreterIfTest {
 
         // Then
         val expectedPrinter = TestPrinter()
-        interpretSourceWithAntlr(source, expectedPrinter)
+        AntlrInterpreter.interpretSource(source, expectedPrinter)
         Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
         Mockito.verifyNoInteractions(errorReporter)
     }
@@ -67,7 +60,7 @@ class InterpreterIfTest {
 
         // Then
         val expectedPrinter = TestPrinter()
-        interpretSourceWithAntlr(source, expectedPrinter)
+        AntlrInterpreter.interpretSource(source, expectedPrinter)
         Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
         Mockito.verifyNoInteractions(errorReporter)
     }
@@ -91,7 +84,7 @@ class InterpreterIfTest {
 
         // Then
         val expectedPrinter = TestPrinter()
-        interpretSourceWithAntlr(source, expectedPrinter)
+        AntlrInterpreter.interpretSource(source, expectedPrinter)
         Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
         Mockito.verifyNoInteractions(errorReporter)
     }
@@ -115,7 +108,7 @@ class InterpreterIfTest {
 
         // Then
         val expectedPrinter = TestPrinter()
-        interpretSourceWithAntlr(source, expectedPrinter)
+        AntlrInterpreter.interpretSource(source, expectedPrinter)
         Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
         Mockito.verifyNoInteractions(errorReporter)
     }
@@ -133,22 +126,6 @@ class InterpreterIfTest {
         val tokens: List<Token> = scanner.scanTokens()
         val parser = Parser(Tokens(tokens), errorReporter)
         return parser.parse()
-    }
-
-    private fun interpretSourceWithAntlr(source: String, printer: TestPrinter) {
-        val inputStream = CharStreams.fromStream(ByteArrayInputStream(source.toByteArray()))
-        val loxLexer = LoxLexer(inputStream)
-        val tokenStream = CommonTokenStream(loxLexer)
-        val loxParser = LoxParser(tokenStream).apply {
-            errorHandler = BailErrorStrategy()
-        }
-        val environment = Environment()
-        val programContext: LoxParser.ProgramContext = loxParser.program()
-        InterpretStmtVisitor(
-            interpretExprVisitor = InterpretExprVisitor(environment),
-            environment = environment,
-            printer = printer
-        ).visitProgram(programContext)
     }
 
 }
