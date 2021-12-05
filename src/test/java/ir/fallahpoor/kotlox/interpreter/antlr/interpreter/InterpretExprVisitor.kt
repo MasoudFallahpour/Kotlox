@@ -1,4 +1,4 @@
-package ir.fallahpoor.kotlox.interpreter.interpreter
+package ir.fallahpoor.kotlox.interpreter.antlr.interpreter
 
 import ir.fallahpoor.kotlox.interpreter.Environment
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
