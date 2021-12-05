@@ -192,6 +192,12 @@ class Interpreter(
         }
     }
 
+    override fun visitWhileStmt(stmt: Stmt.While) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
+    }
+
     override fun visitVariableExpr(expr: Expr.Variable): Any? = environment.get(expr.name)
 
     override fun visitBlockStmt(stmt: Stmt.Block) {

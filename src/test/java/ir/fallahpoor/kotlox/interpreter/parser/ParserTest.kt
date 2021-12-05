@@ -32,7 +32,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -48,7 +48,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -64,7 +64,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -80,7 +80,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -96,7 +96,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -112,7 +112,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -128,7 +128,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -144,7 +144,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -160,7 +160,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -176,7 +176,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -192,7 +192,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -212,7 +212,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -232,7 +232,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -255,7 +255,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -276,7 +276,7 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -312,14 +312,14 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
 
     @Test
-    fun test17() {
+    fun testIf() {
 
         // Given
         val source =
@@ -344,7 +344,36 @@ class ParserTest {
         val actualStatements: List<Stmt> = parseSource(source)
 
         // Then
-        val expectedStatements: List<Stmt>? = AntlrParser.parserSource(source)
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testWhile() {
+
+        // TODO add the following line when for loops are added.
+        //  while (false) for (;;) 1;
+
+        // Given
+        val source =
+            """var c = 0;
+               while (c < 3) print c = c + 1;           
+               var a = 0;
+               while (a < 3) {
+                   print a;
+                   a = a + 1;
+               }
+               while (false) if (true) 1; else 2;
+               while (false) while (true) 1;
+             """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
         Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
         Mockito.verifyNoInteractions(errorReporter)
 

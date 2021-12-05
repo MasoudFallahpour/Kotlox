@@ -10,7 +10,7 @@ import java.io.ByteArrayInputStream
 
 object AntlrParser {
 
-    fun parserSource(source: String): List<Stmt>? {
+    fun parserSource(source: String): List<Stmt> {
         val loxParser: LoxParser = createParser(source)
         val programContext: LoxParser.ProgramContext = loxParser.program()
         return BuildStmtVisitor(BuildExprVisitor()).visitProgram(programContext)

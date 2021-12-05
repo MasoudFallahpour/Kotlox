@@ -14,10 +14,11 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * program     -> declaration* EOF
  * declaration -> varDecl | statement
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
- * statement   -> exprStmt | ifStmt | printStmt | block
+ * statement   -> exprStmt | ifStmt | printStmt | whileStmt | block
  * exprStmt    -> expression ";"
  * ifStmt      -> "if" "(" expression ")" statement ("else" statement)?
  * printStmt   -> "print" expression ";"
+ * whileStmt   -> "while" "(" expression ")" statement
  * block       -> "{" declaration* "}"
  * expression  -> assignment
  * assignment  -> IDENTIFIER "=" assignment | logicOr ("," logicOr)*
@@ -76,6 +77,8 @@ class Parser(
             ifStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
             printStatement()
+        } else if (tokens.getNextTokenIfItHasType(TokenType.WHILE)) {
+            whileStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_BRACE)) {
             Stmt.Block(block())
         } else {
@@ -99,6 +102,14 @@ class Parser(
         val value = expression()
         consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Print(value)
+    }
+
+    private fun whileStatement(): Stmt {
+        consumeTokenOrThrowError(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        val condition = expression()
+        consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
+        val body = statement()
+        return Stmt.While(condition, body)
     }
 
     private fun block(): List<Stmt> {

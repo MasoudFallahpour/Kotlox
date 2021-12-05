@@ -41,7 +41,7 @@ class InterpretStmtVisitor(
         environment.define(ctx.IDENTIFIER().symbol.text, value)
     }
 
-    // Evaluates rule: statement -> exprStmt | ifStmt | printStmt | block
+    // Evaluates rule: statement -> exprStmt | ifStmt | printStmt | whileStmt | block
     override fun visitStatement(ctx: LoxParser.StatementContext) {
         if (ctx.ifStmt() != null) {
             visitIfStmt(ctx.ifStmt())
@@ -49,6 +49,8 @@ class InterpretStmtVisitor(
             visitExprStmt(ctx.exprStmt())
         } else if (ctx.printStmt() != null) {
             visitPrintStmt(ctx.printStmt())
+        } else if (ctx.whileStmt() != null) {
+            visitWhileStmt(ctx.whileStmt())
         } else if (ctx.block() != null) {
             visitBlock(ctx.block())
         } else {
@@ -69,6 +71,13 @@ class InterpretStmtVisitor(
     override fun visitPrintStmt(ctx: LoxParser.PrintStmtContext) {
         val value: Any? = interpretExprVisitor.visitExpression(ctx.expression())
         printer.println(stringify(value))
+    }
+
+    // Evaluates rule: whileStmt -> "while" "(" expression ")" statement
+    override fun visitWhileStmt(ctx: LoxParser.WhileStmtContext) {
+        while (isTruthy(interpretExprVisitor.visitExpression(ctx.condition))) {
+            visitStatement(ctx.body)
+        }
     }
 
     // Evaluates rule: exprStmt -> expression ";"

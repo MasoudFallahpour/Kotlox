@@ -11,7 +11,11 @@ varDecl
     : 'var' IDENTIFIER ('=' expression)? ';' ;
 
 statement
-    : exprStmt | ifStmt |printStmt | block ;
+    : exprStmt
+    | ifStmt
+    | printStmt
+    | whileStmt
+    | block ;
 
 exprStmt
     : expression ';' ;
@@ -21,6 +25,9 @@ ifStmt
 
 printStmt
     : 'print' expression ';' ;
+
+whileStmt
+    : 'while' '(' condition=expression ')' body=statement ;
 
 block
     : '{' declaration* '}' ;

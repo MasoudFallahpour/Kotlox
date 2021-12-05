@@ -43,7 +43,9 @@ class BuildStmtVisitor(
     }
 
     override fun visitStatement(ctx: LoxParser.StatementContext): List<Stmt> =
-        if (ctx.ifStmt() != null) {
+        if (ctx.whileStmt() != null) {
+            visitWhileStmt(ctx.whileStmt())
+        } else if (ctx.ifStmt() != null) {
             visitIfStmt(ctx.ifStmt())
         } else if (ctx.printStmt() != null) {
             visitPrintStmt(ctx.printStmt())
@@ -54,6 +56,12 @@ class BuildStmtVisitor(
         } else {
             throw RuntimeException()
         }
+
+    override fun visitWhileStmt(ctx: LoxParser.WhileStmtContext): List<Stmt> {
+        val condition: Expr = buildExprVisitor.visitExpression(ctx.condition)
+        val body: List<Stmt> = visitStatement(ctx.body)
+        return listOf(Stmt.While(condition, body[0]))
+    }
 
     override fun visitIfStmt(ctx: LoxParser.IfStmtContext): List<Stmt> {
         val condition: Expr = buildExprVisitor.visitExpression(ctx.expression())

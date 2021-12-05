@@ -67,6 +67,14 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitPrintStmt(LoxParser.PrintStmtContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link LoxParser#whileStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitWhileStmt(LoxParser.WhileStmtContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link LoxParser#block}.
      *
      * @param ctx the parse tree
