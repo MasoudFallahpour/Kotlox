@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.TestPrinter
-import ir.fallahpoor.kotlox.interpreter.antlr.interpreter.AntlrInterpreter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
@@ -37,9 +36,8 @@ class WhileTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("1", "2", "3")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -60,9 +58,8 @@ class WhileTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("0", "1", "2")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -80,9 +77,8 @@ class WhileTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = emptyList<String>()
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
