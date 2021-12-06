@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.TestPrinter
-import ir.fallahpoor.kotlox.interpreter.antlr.interpreter.AntlrInterpreter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
@@ -47,9 +46,8 @@ class LogicalOperatorsTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("false", "1", "false", "true", "3", "true", "false")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -78,9 +76,8 @@ class LogicalOperatorsTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("1", "1", "true", "false", "false", "false", "true")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -102,9 +99,8 @@ class LogicalOperatorsTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("false", "nil", "ok", "ok", "ok")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -126,9 +122,8 @@ class LogicalOperatorsTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("ok", "ok", "true", "0", "s")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
