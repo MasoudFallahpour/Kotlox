@@ -14,8 +14,9 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * program     -> declaration* EOF
  * declaration -> varDecl | statement
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
- * statement   -> exprStmt | ifStmt | printStmt | whileStmt | block
+ * statement   -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block
  * exprStmt    -> expression ";"
+ * forStmt     -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement
  * ifStmt      -> "if" "(" expression ")" statement ("else" statement)?
  * printStmt   -> "print" expression ";"
  * whileStmt   -> "while" "(" expression ")" statement
@@ -73,7 +74,9 @@ class Parser(
     }
 
     private fun statement(): Stmt =
-        if (tokens.getNextTokenIfItHasType(TokenType.IF)) {
+        if (tokens.getNextTokenIfItHasType(TokenType.FOR)) {
+            forStatement()
+        } else if (tokens.getNextTokenIfItHasType(TokenType.IF)) {
             ifStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
             printStatement()
@@ -84,6 +87,42 @@ class Parser(
         } else {
             expressionStatement()
         }
+
+    // A "for loop" in Lox is syntactic sugar. So we desugar it here and convert it to a "while loop".
+    private fun forStatement(): Stmt {
+        consumeTokenOrThrowError(TokenType.LEFT_PAREN, "Expect '(' after 'for'.")
+        val initializer: Stmt? = if (tokens.getNextTokenIfItHasType(TokenType.SEMICOLON)) {
+            null
+        } else if (tokens.getNextTokenIfItHasType(TokenType.VAR)) {
+            varDeclaration()
+        } else {
+            expressionStatement()
+        }
+        var condition: Expr? = if (tokens.nextTokenHasType(TokenType.SEMICOLON)) {
+            null
+        } else {
+            expression()
+        }
+        consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after loop condition.")
+        val increment: Expr? = if (tokens.nextTokenHasType(TokenType.RIGHT_PAREN)) {
+            null
+        } else {
+            expression()
+        }
+        consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
+        var body: Stmt = statement()
+        if (increment != null) {
+            body = Stmt.Block(listOf(body, Stmt.Expression(increment)))
+        }
+        if (condition == null) {
+            condition = Expr.Literal(true)
+        }
+        body = Stmt.While(condition, body)
+        if (initializer != null) {
+            body = Stmt.Block(listOf(initializer, body))
+        }
+        return body
+    }
 
     private fun ifStatement(): Stmt {
         consumeTokenOrThrowError(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")

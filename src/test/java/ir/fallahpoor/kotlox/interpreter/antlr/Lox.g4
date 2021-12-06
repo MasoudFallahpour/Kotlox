@@ -12,6 +12,7 @@ varDecl
 
 statement
     : exprStmt
+    | forStmt
     | ifStmt
     | printStmt
     | whileStmt
@@ -19,6 +20,9 @@ statement
 
 exprStmt
     : expression ';' ;
+
+forStmt
+    : 'for' '(' (varDecl | exprStmt | ';') condition=expression? ';' increment=expression? ')' body=statement ;
 
 ifStmt
     : 'if' '(' expression ')' thenBranch=statement ('else' elseBranch=statement)? ;

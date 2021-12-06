@@ -43,7 +43,9 @@ class BuildStmtVisitor(
     }
 
     override fun visitStatement(ctx: LoxParser.StatementContext): List<Stmt> =
-        if (ctx.whileStmt() != null) {
+        if (ctx.forStmt() != null) {
+            visitForStmt(ctx.forStmt())
+        } else if (ctx.whileStmt() != null) {
             visitWhileStmt(ctx.whileStmt())
         } else if (ctx.ifStmt() != null) {
             visitIfStmt(ctx.ifStmt())
@@ -56,6 +58,52 @@ class BuildStmtVisitor(
         } else {
             throw RuntimeException()
         }
+
+    override fun visitForStmt(ctx: LoxParser.ForStmtContext): List<Stmt> {
+        val initializer: List<Stmt>? = if (ctx.varDecl() != null) {
+            visitVarDecl(ctx.varDecl())
+        } else if (ctx.exprStmt() != null) {
+            visitExprStmt(ctx.exprStmt())
+        } else {
+            null
+        }
+        var condition: Expr? = if (ctx.condition != null) {
+            buildExprVisitor.visitExpression(ctx.condition)
+        } else {
+            null
+        }
+        val increment: Expr? = if (ctx.increment != null) {
+            buildExprVisitor.visitExpression(ctx.increment)
+        } else {
+            null
+        }
+        var body: List<Stmt> = visitStatement(ctx.body)
+        if (increment != null) {
+            body = listOf(
+                Stmt.Block(
+                    listOf(
+                        body[0],
+                        Stmt.Expression(increment)
+                    )
+                )
+            )
+        }
+        if (condition == null) {
+            condition = Expr.Literal(true)
+        }
+        body = listOf(Stmt.While(condition, body[0]))
+        if (initializer != null) {
+            body = listOf(
+                Stmt.Block(
+                    listOf(
+                        initializer[0],
+                        body[0]
+                    )
+                )
+            )
+        }
+        return body
+    }
 
     override fun visitWhileStmt(ctx: LoxParser.WhileStmtContext): List<Stmt> {
         val condition: Expr = buildExprVisitor.visitExpression(ctx.condition)

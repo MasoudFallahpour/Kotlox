@@ -14,7 +14,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
-// TODO add tests for cases when Evaluator catches a runtime error.
+// TODO add tests for cases when Interpreter catches a runtime error.
 
 @RunWith(MockitoJUnitRunner::class)
 class LogicalOperatorsTest {

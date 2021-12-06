@@ -374,9 +374,6 @@ class ParserTest {
     @Test
     fun testWhile() {
 
-        // TODO add the following line when for loops are added.
-        //  while (false) for (;;) 1;
-
         // Given
         val source =
             """var c = 0;
@@ -388,6 +385,7 @@ class ParserTest {
                }
                while (false) if (true) 1; else 2;
                while (false) while (true) 1;
+               while (false) for (;;) 1;
              """
 
         // When

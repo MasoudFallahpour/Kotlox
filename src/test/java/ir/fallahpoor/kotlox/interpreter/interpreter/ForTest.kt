@@ -17,7 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner
 // TODO add tests for cases when Interpreter catches a runtime error.
 
 @RunWith(MockitoJUnitRunner::class)
-class WhileTest {
+class ForTest {
 
     @Mock
     private lateinit var errorReporter: ErrorReporter
@@ -27,8 +27,7 @@ class WhileTest {
 
         // Given
         val source =
-            """var c = 0;
-               while (c < 3) print c = c + 1;
+            """for (var c = 0; c < 3;) print c = c + 1;
              """
 
         // When
@@ -42,14 +41,12 @@ class WhileTest {
     }
 
     @Test
-    fun testSingleBlockBody() {
+    fun testBlockBody() {
 
         // Given
         val source =
-            """var a = 0;
-               while (a < 3) {
+            """for (var a = 0; a < 3; a = a + 1) {
                    print a;
-                   a = a + 1;
                }
              """
 
@@ -63,13 +60,35 @@ class WhileTest {
         Mockito.verifyNoInteractions(errorReporter)
     }
 
+    // TODO uncomment the following line when support for "functions" is added
+//    @Test
+//    fun testNoClauses() {
+//
+//        // Given
+//        val source =
+//            """fun foo() {
+//                   for (;;) return "done";
+//               }
+//               print foo();
+//             """
+//
+//        // When
+//        val actualPrinter = TestPrinter()
+//        interpretSource(source, actualPrinter)
+//
+//        // Then
+//        val expectedOutput = listOf("done")
+//        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+//        Mockito.verifyNoInteractions(errorReporter)
+//    }
+
     @Test
-    fun testStatementBody() {
+    fun testNoInitializer() {
 
         // Given
         val source =
-            """while (false) if (true) 1; else 2;
-               while (false) while (true) 1;
+            """var i = 0;
+               for (; i < 2; i = i + 1) print i;
              """
 
         // When
@@ -77,9 +96,56 @@ class WhileTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedOutput = emptyList<String>()
+        val expectedOutput = listOf("0", "1")
         Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
+    }
+
+    // TODO uncomment the following line when support for "functions" is added
+//    @Test
+//    fun testNoCondition() {
+//
+//        // Given
+//        val source =
+//            """fun bar() {
+//                   for (var i = 0;; i = i + 1) {
+//                       print i;
+//                       if (i >= 2) return;
+//                    }
+//               }
+//               bar();
+//             """
+//
+//        // When
+//        val actualPrinter = TestPrinter()
+//        interpretSource(source, actualPrinter)
+//
+//        // Then
+//        val expectedOutput = listOf("0", "1", "2")
+//        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+//        Mockito.verifyNoInteractions(errorReporter)
+//    }
+
+    @Test
+    fun testNoIncrement() {
+
+        // Given
+        val source =
+            """for (var i = 0; i < 2;) {
+                   print i;
+                   i = i + 1;
+               }
+             """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedOutput = listOf("0", "1")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+        Mockito.verifyNoInteractions(errorReporter)
+
     }
 
     private fun interpretSource(source: String, printer: TestPrinter) {
