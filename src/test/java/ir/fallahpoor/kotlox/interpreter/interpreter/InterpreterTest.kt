@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.TestPrinter
-import ir.fallahpoor.kotlox.interpreter.antlr.interpreter.AntlrInterpreter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
@@ -36,9 +35,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("0.33333333333333337")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -54,9 +52,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("1.5")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -72,9 +69,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("false")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -90,9 +86,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("-10")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -108,9 +103,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("true")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -126,9 +120,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("false")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -144,9 +137,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("true")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -162,9 +154,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("true")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -180,9 +171,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("false")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -198,9 +188,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("true")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -216,9 +205,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("1hello1")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -234,9 +222,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("Hello World!")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -256,9 +243,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("one", "true", "3")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -278,9 +264,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("2")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -303,9 +288,8 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("2", "5")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
@@ -341,9 +325,18 @@ class InterpreterTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf(
+            "inner a",
+            "outer b",
+            "global c",
+            "outer a",
+            "outer b",
+            "global c",
+            "global a",
+            "global b",
+            "global c"
+        )
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
 
     }
