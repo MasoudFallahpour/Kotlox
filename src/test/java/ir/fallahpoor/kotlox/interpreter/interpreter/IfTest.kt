@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.TestPrinter
-import ir.fallahpoor.kotlox.interpreter.antlr.interpreter.AntlrInterpreter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
@@ -38,9 +37,8 @@ class IfTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("good")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -60,9 +58,8 @@ class IfTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("good", "good", "block")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
@@ -84,16 +81,15 @@ class IfTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("good", "block", "true")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
     @Test
     fun testTruth() {
 
-        // Given
+        // Given that everything except "false" and "nil" are true.
         val source =
             """
                 if (false) print "bad"; else print "false";
@@ -108,9 +104,8 @@ class IfTest {
         interpretSource(source, actualPrinter)
 
         // Then
-        val expectedPrinter = TestPrinter()
-        AntlrInterpreter.interpretSource(source, expectedPrinter)
-        Truth.assertThat(actualPrinter.output).isEqualTo(expectedPrinter.output)
+        val expectedOutput = listOf("false", "nil", "true", "0", "empty")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
         Mockito.verifyNoInteractions(errorReporter)
     }
 
