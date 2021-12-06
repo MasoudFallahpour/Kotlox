@@ -41,7 +41,9 @@ Chapter 7: Evaluating Expressions (done)
 
 Chapter 8: Statements and State (done)
 
-Chapter 9: Control Flow (I'm here!)
+Chapter 9: Control Flow (done)
+
+Chapter 10: Functions (I'm here!)
 
 Unit Tests
 -
