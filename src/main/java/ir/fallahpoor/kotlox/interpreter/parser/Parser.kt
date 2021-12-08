@@ -6,6 +6,7 @@ import ir.fallahpoor.kotlox.interpreter.Expr.Logical
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
+import java.util.*
 
 /**
  * This class implements a recursive descent parser for the following grammar. The grammar is
@@ -14,13 +15,14 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
  * program     -> declaration* EOF
  * declaration -> varDecl | statement
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
- * statement   -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block
+ * statement   -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block | breakStmt
  * exprStmt    -> expression ";"
  * forStmt     -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement
  * ifStmt      -> "if" "(" expression ")" statement ("else" statement)?
  * printStmt   -> "print" expression ";"
  * whileStmt   -> "while" "(" expression ")" statement
  * block       -> "{" declaration* "}"
+ * breakStmt   -> "break" ";"
  * expression  -> assignment
  * assignment  -> IDENTIFIER "=" assignment | logicOr ("," logicOr)*
  * logicOr     -> logicAnd ("or" logicAnd)*
@@ -38,6 +40,8 @@ class Parser(
 ) {
 
     class ParseError : RuntimeException()
+
+    private var breakStack = Stack<Boolean>()
 
     fun parse(): List<Stmt> {
         val statements = mutableListOf<Stmt>()
@@ -73,20 +77,38 @@ class Parser(
         return Stmt.Var(name, initializer)
     }
 
-    private fun statement(): Stmt =
-        if (tokens.getNextTokenIfItHasType(TokenType.FOR)) {
-            forStatement()
+    private fun statement(): Stmt {
+        val stmt: Stmt
+        if (tokens.getNextTokenIfItHasType(TokenType.BREAK)) {
+            stmt = breakStatement()
+        } else if (tokens.getNextTokenIfItHasType(TokenType.FOR)) {
+            breakStack.push(true)
+            stmt = forStatement()
+            breakStack.pop()
         } else if (tokens.getNextTokenIfItHasType(TokenType.IF)) {
-            ifStatement()
+            stmt = ifStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
-            printStatement()
+            stmt = printStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.WHILE)) {
-            whileStatement()
+            breakStack.push(true)
+            stmt = whileStatement()
+            breakStack.pop()
         } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_BRACE)) {
-            Stmt.Block(block())
+            stmt = Stmt.Block(block())
         } else {
-            expressionStatement()
+            stmt = expressionStatement()
         }
+        return stmt
+    }
+
+    private fun breakStatement(): Stmt {
+        val breakToken = tokens.getPreviousToken()
+        consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after 'break'.")
+        if (!breakStack.peek()) {
+            error(breakToken, "'break' is only allowed inside a loop.")
+        }
+        return Stmt.Break
+    }
 
     // A "for loop" in Lox is syntactic sugar. So we desugar it here and convert it to a "while loop".
     private fun forStatement(): Stmt {

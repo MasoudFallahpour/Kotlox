@@ -11,30 +11,34 @@ varDecl
     : 'var' IDENTIFIER ('=' expression)? ';' ;
 
 statement
-    : exprStmt
+    : ifStmt
     | forStmt
-    | ifStmt
-    | printStmt
     | whileStmt
-    | block ;
-
-exprStmt
-    : expression ';' ;
-
-forStmt
-    : 'for' '(' (varDecl | exprStmt | ';') condition=expression? ';' increment=expression? ')' body=statement ;
+    | breakStmt
+    | block
+    | printStmt
+    | exprStmt ;
 
 ifStmt
     : 'if' '(' expression ')' thenBranch=statement ('else' elseBranch=statement)? ;
 
-printStmt
-    : 'print' expression ';' ;
+forStmt
+    : 'for' '(' (varDecl | exprStmt | ';') condition=expression? ';' increment=expression? ')' body=statement ;
 
 whileStmt
     : 'while' '(' condition=expression ')' body=statement ;
 
+breakStmt
+    : 'break' ';' ;
+
 block
     : '{' declaration* '}' ;
+
+printStmt
+    : 'print' expression ';' ;
+
+exprStmt
+    : expression ';' ;
 
 expression
     : assignment ;

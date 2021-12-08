@@ -18,6 +18,7 @@ object Keywords {
     const val TRUE = "true"
     const val VAR = "var"
     const val WHILE = "while"
+    const val BREAK = "break"
 
     private val keywords = mapOf(
         AND to TokenType.AND,
@@ -35,7 +36,8 @@ object Keywords {
         THIS to TokenType.THIS,
         TRUE to TokenType.TRUE,
         VAR to TokenType.VAR,
-        WHILE to TokenType.WHILE
+        WHILE to TokenType.WHILE,
+        BREAK to TokenType.BREAK
     )
 
     fun get(text: String): TokenType? = keywords[text]

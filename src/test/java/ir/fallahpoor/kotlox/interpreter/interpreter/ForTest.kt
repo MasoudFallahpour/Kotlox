@@ -148,6 +148,115 @@ class ForTest {
 
     }
 
+    @Test
+    fun testSingleBreakStatement() {
+
+        // Given
+        val source =
+            """for (var a = 1; a <= 10; i = i + 1) break;
+            """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedOutput = emptyList<String>()
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+        Mockito.verifyNoInteractions(errorReporter)
+    }
+
+    @Test
+    fun testBreakNestedInsideIf() {
+
+        // Given
+        val source =
+            """for (var a = 1; a <= 10; a = a + 1) {
+                   print a;
+                   if (a >= 5) {
+                       break;
+                   }
+               }
+            """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedOutput = listOf("1", "2", "3", "4", "5")
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+        Mockito.verifyNoInteractions(errorReporter)
+    }
+
+    @Test
+    fun testBreakNestedInsideWhile() {
+
+        // Given
+        val source =
+            """var b;
+               for (var a = 1; a <= 10; a = a + 1) {
+                   print a;
+                   if (a >= 5) break;
+                   b = 10;
+                   while (b <= 100) {
+                       print b;
+                       if (b >= 50) {
+                           break;
+                       }
+                       b = b + 10;
+                   }
+               }
+            """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedOutput = listOf(
+            "1", "10", "20", "30", "40", "50",
+            "2", "10", "20", "30", "40", "50",
+            "3", "10", "20", "30", "40", "50",
+            "4", "10", "20", "30", "40", "50",
+            "5"
+        )
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+        Mockito.verifyNoInteractions(errorReporter)
+    }
+
+    @Test
+    fun testBreakNestedInsideFor() {
+
+        val source =
+            """for (var a = 1; a <= 10; a = a + 1) {
+                   print a;
+                   if (a >= 5) break;
+                   for (var b = 10; b <= 100; b = b + 10) {
+                       print b;
+                       if (b >= 50) {
+                           break;
+                       }
+                   }
+               }
+            """
+
+        // When
+        val actualPrinter = TestPrinter()
+        interpretSource(source, actualPrinter)
+
+        // Then
+        val expectedOutput = listOf(
+            "1", "10", "20", "30", "40", "50",
+            "2", "10", "20", "30", "40", "50",
+            "3", "10", "20", "30", "40", "50",
+            "4", "10", "20", "30", "40", "50",
+            "5"
+        )
+        Truth.assertThat(actualPrinter.output).isEqualTo(expectedOutput)
+        Mockito.verifyNoInteractions(errorReporter)
+    }
+
     private fun interpretSource(source: String, printer: TestPrinter) {
         val statements: List<Stmt> = parseSource(source)
         if (statements.isNotEmpty()) {

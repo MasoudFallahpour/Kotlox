@@ -30,7 +30,8 @@ fun main() {
             "If         -> condition: Expr, thenBranch: Stmt, elseBranch: Stmt?",
             "Print      -> expression: Expr",
             "Var        -> name: Token, initializer: Expr?",
-            "While      -> condition: Expr, body: Stmt"
+            "While      -> condition: Expr, body: Stmt",
+            "Break      ->"
         )
     )
 }
@@ -63,16 +64,21 @@ private fun defineType(
     className: String,
     propertyList: String
 ) {
-    writer.println("${SINGLE_INDENT}data class $className(")
-    val properties = propertyList.split(", ")
-    properties.forEachIndexed { i, v ->
-        if (i != properties.lastIndex) {
-            writer.println("${DOUBLE_INDENT}val $v,")
-        } else {
-            writer.println("${DOUBLE_INDENT}val $v")
+    val properties = propertyList.split(", ").filter { it.isNotBlank() }
+    if (properties.isNotEmpty()) {
+        writer.println("${SINGLE_INDENT}data class $className(")
+        properties.forEachIndexed { i, v ->
+            if (i != properties.lastIndex) {
+                writer.println("${DOUBLE_INDENT}val $v,")
+            } else {
+                writer.println("${DOUBLE_INDENT}val $v")
+            }
         }
+        writer.print("${SINGLE_INDENT})")
+    } else {
+        writer.print("${SINGLE_INDENT}object $className")
     }
-    writer.println("${SINGLE_INDENT}) : $baseName() {")
+    writer.println(" : $baseName() {")
     writer.println("${DOUBLE_INDENT}override fun <R> accept(visitor: Visitor<R>): R {")
     writer.println("${TRIPLE_INDENT}return visitor.visit$className$baseName(this)")
     writer.println("${DOUBLE_INDENT}}")

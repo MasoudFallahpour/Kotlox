@@ -10,6 +10,8 @@ class Interpreter(
     private val printer: Printer
 ) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
+    private class BreakException : RuntimeException()
+
     companion object {
         private const val ERROR_MESSAGE_INCOMPATIBLE_TYPES = "Operands are incompatible."
         private const val ERROR_MESSAGE_OPERAND_MUST_BE_A_NUMBER = "Operand must be a number."
@@ -193,8 +195,13 @@ class Interpreter(
     }
 
     override fun visitWhileStmt(stmt: Stmt.While) {
-        while (isTruthy(evaluate(stmt.condition))) {
-            execute(stmt.body)
+        try {
+            while (isTruthy(evaluate(stmt.condition))) {
+                execute(stmt.body)
+            }
+        } catch (e: BreakException) {
+            // No need to do anything here. Because the exception has terminated the while loop.
+            // And that's exactly what we want when encountering a 'break' 'statement.
         }
     }
 
@@ -214,6 +221,11 @@ class Interpreter(
         } finally {
             this@Interpreter.environment = previousEnvironment
         }
+    }
+
+    @Throws(BreakException::class)
+    override fun visitBreakStmt(stmt: Stmt.Break) {
+        throw BreakException()
     }
 
     // 'false' and 'nil' are falsey, and everything else is truthy.

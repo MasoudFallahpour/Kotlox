@@ -83,6 +83,111 @@ class WhileTest {
 
     }
 
+    @Test
+    fun testSingleBreakStatement() {
+
+        // Given
+        val source =
+            """var a = 1;
+               while (a <= 10) break;
+            """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testBreakNestedInsideIf() {
+
+        // Given
+        val source =
+            """var a = 1;
+               while (a <= 10) {
+                   print a;
+                   if (a >= 5) {
+                       break;
+                   }
+                   a = a + 1;
+               }
+            """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testBreakNestedInsideWhile() {
+
+        // Given
+        val source =
+            """var a = 1;
+               var b;
+               while (a <= 10) {
+                   print a;
+                   if (a >= 5) {
+                       break;
+                   }
+                   a = a + 1;
+                   b = 10;
+                   while (b <= 100) {
+                       print b;
+                       if (b >= 50) break;
+                       b = b + 10;
+                    }
+                }
+            """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testBreakNestedInsideFor() {
+
+        // Given
+        val source =
+            """var a = 1;
+               while (a <= 10) {
+                   print a;
+                   if (a >= 5) {
+                       break;
+                   }
+                   a = a + 1;
+                   for (var b = 10; b <= 100; b = b + 10) {
+                       print b;
+                       if (b >= 50) break;
+                   }
+               }
+            """
+
+        // When
+        val actualStatements: List<Stmt> = parseSource(source)
+
+        // Then
+        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
+        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
     private fun parseSource(source: String): List<Stmt> {
         val parser = createParser(source)
         return parser.parse()

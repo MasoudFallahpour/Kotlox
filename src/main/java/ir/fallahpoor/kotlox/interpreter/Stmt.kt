@@ -11,6 +11,7 @@ sealed class Stmt {
         fun visitPrintStmt(stmt: Print): R
         fun visitVarStmt(stmt: Var): R
         fun visitWhileStmt(stmt: While): R
+        fun visitBreakStmt(stmt: Break): R
     }
 
     data class Block(
@@ -62,6 +63,12 @@ sealed class Stmt {
     ) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitWhileStmt(this)
+        }
+    }
+
+    object Break : Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitBreakStmt(this)
         }
     }
 

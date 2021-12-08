@@ -6,10 +6,13 @@ import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
+import java.util.*
 
 class BuildStmtVisitor(
     private val buildExprVisitor: BuildExprVisitor
 ) : LoxBaseVisitor<List<Stmt>>() {
+
+    private val breakStack = Stack<Boolean>()
 
     override fun visitProgram(ctx: LoxParser.ProgramContext): List<Stmt> =
         if (ctx.declaration().isNullOrEmpty()) {
@@ -42,22 +45,43 @@ class BuildStmtVisitor(
         return listOf(Stmt.Var(token, initializer))
     }
 
-    override fun visitStatement(ctx: LoxParser.StatementContext): List<Stmt> =
-        if (ctx.forStmt() != null) {
-            visitForStmt(ctx.forStmt())
+    override fun visitStatement(ctx: LoxParser.StatementContext): List<Stmt> {
+        val statements: List<Stmt>
+        if (ctx.ifStmt() != null) {
+            statements = visitIfStmt(ctx.ifStmt())
+        } else if (ctx.forStmt() != null) {
+            breakStack.push(true)
+            statements = visitForStmt(ctx.forStmt())
+            breakStack.push(false)
         } else if (ctx.whileStmt() != null) {
-            visitWhileStmt(ctx.whileStmt())
-        } else if (ctx.ifStmt() != null) {
-            visitIfStmt(ctx.ifStmt())
-        } else if (ctx.printStmt() != null) {
-            visitPrintStmt(ctx.printStmt())
+            breakStack.push(true)
+            statements = visitWhileStmt(ctx.whileStmt())
+            breakStack.push(false)
+        } else if (ctx.breakStmt() != null) {
+            statements = visitBreakStmt(ctx.breakStmt())
         } else if (ctx.block() != null) {
-            visitBlock(ctx.block())
+            statements = visitBlock(ctx.block())
+        } else if (ctx.printStmt() != null) {
+            statements = visitPrintStmt(ctx.printStmt())
         } else if (ctx.exprStmt() != null) {
-            visitExprStmt(ctx.exprStmt())
+            statements = visitExprStmt(ctx.exprStmt())
         } else {
             throw RuntimeException()
         }
+        return statements
+    }
+
+    override fun visitIfStmt(ctx: LoxParser.IfStmtContext): List<Stmt> {
+        val condition: Expr = buildExprVisitor.visitExpression(ctx.expression())
+        val thenBranch: List<Stmt> = visitStatement(ctx.thenBranch)
+        val ifStmt = if (ctx.elseBranch != null) {
+            val elseBranch: List<Stmt> = visitStatement(ctx.elseBranch)
+            Stmt.If(condition, thenBranch[0], elseBranch[0])
+        } else {
+            Stmt.If(condition, thenBranch[0], null)
+        }
+        return listOf(ifStmt)
+    }
 
     override fun visitForStmt(ctx: LoxParser.ForStmtContext): List<Stmt> {
         val initializer: List<Stmt>? = if (ctx.varDecl() != null) {
@@ -111,21 +135,11 @@ class BuildStmtVisitor(
         return listOf(Stmt.While(condition, body[0]))
     }
 
-    override fun visitIfStmt(ctx: LoxParser.IfStmtContext): List<Stmt> {
-        val condition: Expr = buildExprVisitor.visitExpression(ctx.expression())
-        val thenBranch: List<Stmt> = visitStatement(ctx.thenBranch)
-        val ifStmt = if (ctx.elseBranch != null) {
-            val elseBranch: List<Stmt> = visitStatement(ctx.elseBranch)
-            Stmt.If(condition, thenBranch[0], elseBranch[0])
-        } else {
-            Stmt.If(condition, thenBranch[0], null)
+    override fun visitBreakStmt(ctx: LoxParser.BreakStmtContext?): List<Stmt> {
+        if (!breakStack.peek()) {
+            throw RuntimeException()
         }
-        return listOf(ifStmt)
-    }
-
-    override fun visitPrintStmt(ctx: LoxParser.PrintStmtContext): List<Stmt> {
-        val expr: Expr = buildExprVisitor.visitExpression(ctx.expression())
-        return listOf(Stmt.Print(expr))
+        return listOf(Stmt.Break)
     }
 
     override fun visitBlock(ctx: LoxParser.BlockContext): List<Stmt> {
@@ -136,6 +150,11 @@ class BuildStmtVisitor(
             }
         }
         return listOf(Stmt.Block(statements))
+    }
+
+    override fun visitPrintStmt(ctx: LoxParser.PrintStmtContext): List<Stmt> {
+        val expr: Expr = buildExprVisitor.visitExpression(ctx.expression())
+        return listOf(Stmt.Print(expr))
     }
 
     override fun visitExprStmt(ctx: LoxParser.ExprStmtContext): List<Stmt> {
