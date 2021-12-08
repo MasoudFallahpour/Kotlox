@@ -1,16 +1,23 @@
 package ir.fallahpoor.kotlox.interpreter.antlr.parser
 
+import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Expr
 import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
+import org.antlr.v4.runtime.tree.TerminalNode
 import java.util.*
 
 class BuildStmtVisitor(
-    private val buildExprVisitor: BuildExprVisitor
+    private val buildExprVisitor: BuildExprVisitor,
+    private val errorReporter: ErrorReporter
 ) : LoxBaseVisitor<List<Stmt>>() {
+
+    companion object {
+        private const val FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE = 255
+    }
 
     private val breakStack = Stack<Boolean>()
 
@@ -19,20 +26,76 @@ class BuildStmtVisitor(
             emptyList()
         } else {
             val statements = mutableListOf<Stmt>()
-            for (i in 0..ctx.declaration().lastIndex) {
+            for (i in ctx.declaration().indices) {
                 statements += visitDeclaration(ctx.declaration(i))
             }
             statements
         }
 
     override fun visitDeclaration(ctx: LoxParser.DeclarationContext): List<Stmt> =
-        if (ctx.varDecl() != null) {
+        if (ctx.funcDecl() != null) {
+            visitFuncDecl(ctx.funcDecl())
+        } else if (ctx.varDecl() != null) {
             visitVarDecl(ctx.varDecl())
         } else if (ctx.statement() != null) {
             visitStatement(ctx.statement())
         } else {
             throw RuntimeException()
         }
+
+    override fun visitFuncDecl(ctx: LoxParser.FuncDeclContext): List<Stmt> =
+        visitFunction(ctx.function())
+
+    override fun visitFunction(ctx: LoxParser.FunctionContext): List<Stmt> {
+        val parameters: List<Stmt> = if (ctx.parameters() != null) {
+            visitParameters(ctx.parameters())
+        } else {
+            emptyList()
+        }
+        val functionNameToken = Token(
+            type = TokenType.IDENTIFIER,
+            lexeme = ctx.IDENTIFIER().symbol.text,
+            literal = null,
+            line = ctx.IDENTIFIER().symbol.line
+        )
+        val functionBody: List<Stmt> = visitBlock(ctx.block())
+        return listOf(
+            Stmt.Function(
+                name = functionNameToken,
+                params = parameters.map { stmt: Stmt ->
+                    val identifier = (stmt as Stmt.Expression).expression as Expr.Variable
+                    identifier.name
+                },
+                body = (functionBody[0] as Stmt.Block).statements
+            )
+        )
+    }
+
+    override fun visitParameters(ctx: LoxParser.ParametersContext): List<Stmt> {
+        val parameters = mutableListOf<Stmt.Expression>().apply {
+            add(
+                Stmt.Expression(
+                    Expr.Variable(createIdentifierToken(ctx.IDENTIFIER(0)))
+                )
+            )
+        }
+        for (i in ctx.comma.indices) {
+            val token: Token = createIdentifierToken(ctx.IDENTIFIER(i + 1))
+            if (parameters.size >= FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE) {
+                errorReporter.error(token, "Can't have more than 255 parameters.")
+            }
+            parameters += Stmt.Expression(Expr.Variable(token))
+        }
+        return parameters
+    }
+
+    private fun createIdentifierToken(identifier: TerminalNode) =
+        Token(
+            type = TokenType.IDENTIFIER,
+            lexeme = identifier.symbol.text,
+            literal = null,
+            line = identifier.symbol.line
+        )
 
     override fun visitVarDecl(ctx: LoxParser.VarDeclContext): List<Stmt> {
         val name = ctx.IDENTIFIER().symbol.text

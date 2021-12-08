@@ -1,6 +1,8 @@
 package ir.fallahpoor.kotlox.interpreter.antlr.parser
 
+import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Stmt
+import ir.fallahpoor.kotlox.interpreter.TestPrinter
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxParser
 import org.antlr.v4.runtime.BailErrorStrategy
@@ -13,7 +15,8 @@ object AntlrParser {
     fun parserSource(source: String): List<Stmt> {
         val loxParser: LoxParser = createParser(source)
         val programContext: LoxParser.ProgramContext = loxParser.program()
-        return BuildStmtVisitor(BuildExprVisitor()).visitProgram(programContext)
+        val errorReporter = ErrorReporter(TestPrinter())
+        return BuildStmtVisitor(BuildExprVisitor(errorReporter), errorReporter).visitProgram(programContext)
     }
 
     private fun createParser(source: String): LoxParser {

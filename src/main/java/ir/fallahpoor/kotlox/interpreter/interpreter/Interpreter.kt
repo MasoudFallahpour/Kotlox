@@ -1,7 +1,10 @@
 package ir.fallahpoor.kotlox.interpreter.interpreter
 
-import ir.fallahpoor.kotlox.interpreter.*
+import ir.fallahpoor.kotlox.interpreter.ErrorReporter
+import ir.fallahpoor.kotlox.interpreter.Expr
 import ir.fallahpoor.kotlox.interpreter.Expr.Logical
+import ir.fallahpoor.kotlox.interpreter.Printer
+import ir.fallahpoor.kotlox.interpreter.Stmt
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
@@ -18,7 +21,27 @@ class Interpreter(
         private const val ERROR_MESSAGE_DIVISION_BY_ZERO = "Division by zero."
     }
 
-    private var environment = Environment()
+    val globals = Environment()
+    private var environment = globals
+
+    init {
+        defineNativeFunctionClock()
+    }
+
+    private fun defineNativeFunctionClock() {
+        globals.define(
+            "clock",
+            object : LoxCallable {
+                override fun arity(): Int = 0
+
+                override fun call(interpreter: Interpreter, arguments: List<Any?>): Any {
+                    return System.currentTimeMillis().toDouble() / 1000.0
+                }
+
+                override fun toString(): String = "<native fn>"
+            }
+        )
+    }
 
     fun interpret(statements: List<Stmt>) {
         try {
@@ -140,6 +163,32 @@ class Interpreter(
             a.equals(b)
         }
 
+    override fun visitCallExpr(expr: Expr.Call): Any? {
+        val callee: Any? = evaluate(expr.callee)
+
+        val arguments = mutableListOf<Any?>()
+        for (argument in expr.arguments) {
+            arguments += evaluate(argument)
+        }
+
+        if (callee !is LoxCallable) {
+            throw RuntimeError(
+                expr.paren,
+                "Can only call functions and classes."
+            )
+        }
+
+        val function: LoxCallable = callee
+        if (arguments.size != function.arity()) {
+            throw RuntimeError(
+                expr.paren,
+                "Expected " + function.arity().toString() +
+                        " arguments but got " + arguments.size.toString() + "."
+            )
+        }
+        return function.call(this, arguments)
+    }
+
     override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)
 
     private fun evaluate(expr: Expr): Any? = expr.accept(this)
@@ -170,6 +219,11 @@ class Interpreter(
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
+    }
+
+    override fun visitFunctionStmt(stmt: Stmt.Function) {
+        val function = LoxFunction(stmt)
+        environment.define(stmt.name.lexeme, function)
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
@@ -211,7 +265,7 @@ class Interpreter(
         executeBlock(stmt.statements, Environment(environment))
     }
 
-    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+    fun executeBlock(statements: List<Stmt>, environment: Environment) {
         val previousEnvironment = this@Interpreter.environment
         try {
             this@Interpreter.environment = environment

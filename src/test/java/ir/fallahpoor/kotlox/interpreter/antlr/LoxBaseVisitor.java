@@ -40,6 +40,39 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override
+    public T visitFuncDecl(LoxParser.FuncDeclContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitFunction(LoxParser.FunctionContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitParameters(LoxParser.ParametersContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
     public T visitVarDecl(LoxParser.VarDeclContext ctx) {
         return visitChildren(ctx);
     }
@@ -62,7 +95,7 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override
-    public T visitExprStmt(LoxParser.ExprStmtContext ctx) {
+    public T visitIfStmt(LoxParser.IfStmtContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -84,29 +117,18 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override
-    public T visitIfStmt(LoxParser.IfStmtContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
-    @Override
-    public T visitPrintStmt(LoxParser.PrintStmtContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     */
-    @Override
     public T visitWhileStmt(LoxParser.WhileStmtContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitBreakStmt(LoxParser.BreakStmtContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -128,7 +150,18 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override
-    public T visitBreakStmt(LoxParser.BreakStmtContext ctx) {
+    public T visitPrintStmt(LoxParser.PrintStmtContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitExprStmt(LoxParser.ExprStmtContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -228,6 +261,28 @@ public class LoxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Lo
      */
     @Override
     public T visitUnary(LoxParser.UnaryContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitCall(LoxParser.CallContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
+    public T visitArguments(LoxParser.ArgumentsContext ctx) {
         return visitChildren(ctx);
     }
 

@@ -13,7 +13,10 @@ import java.util.*
  * unambiguous and has no left-recursive rules. Otherwise, it would not be possible to implement
  * such a parser.
  * program     -> declaration* EOF
- * declaration -> varDecl | statement
+ * declaration -> funcDecl | varDecl | statement
+ * funcDecl    -> "fun" function
+ * function    -> IDENTIFIER "(" parameters? ")" block
+ * parameters  -> IDENTIFIER ( "," IDENTIFIER )*
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
  * statement   -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block | breakStmt
  * exprStmt    -> expression ";"
@@ -31,17 +34,23 @@ import java.util.*
  * comparison  -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
  * term        -> factor ( ( "-" | "+" ) factor )*
  * factor      -> unary ( ( "/" | "*" ) unary )*
- * unary       -> ( "!" | "-" ) unary | primary
+ * unary       -> ( "!" | "-" ) unary | call
+ * call        -> primary ( "(" arguments? ")" )*
+ * arguments   -> expression ( "," expression )* ;
  * primary     -> NUMBER | STRING | IDENTIFIER | "true" | "false" | "nil" | "(" expression ")"
  */
 class Parser(
-    private val tokens: Tokens,
-    private val errorReporter: ErrorReporter
+    private val tokens: Tokens, private val errorReporter: ErrorReporter
 ) {
+
+    companion object {
+        private const val FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE = 255
+    }
 
     class ParseError : RuntimeException()
 
     private var breakStack = Stack<Boolean>()
+    private var isParsingFunctionArguments = false
 
     fun parse(): List<Stmt> {
         val statements = mutableListOf<Stmt>()
@@ -56,7 +65,9 @@ class Parser(
 
     private fun declaration(): Stmt? {
         return try {
-            if (tokens.getNextTokenIfItHasType(TokenType.VAR)) {
+            if (tokens.getNextTokenIfItHasType((TokenType.FUN))) {
+                function("function")
+            } else if (tokens.getNextTokenIfItHasType(TokenType.VAR)) {
                 varDeclaration()
             } else {
                 statement()
@@ -65,6 +76,24 @@ class Parser(
             synchronize()
             null
         }
+    }
+
+    private fun function(kind: String): Stmt.Function {
+        val name = consumeTokenOrThrowError(TokenType.IDENTIFIER, "Expect $kind name.")
+        consumeTokenOrThrowError(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
+        val parameters = mutableListOf<Token>()
+        if (!tokens.nextTokenHasType(TokenType.RIGHT_PAREN)) {
+            do {
+                if (parameters.size >= FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE) {
+                    errorReporter.error(tokens.peekNextToken(), "Can't have more than 255 parameters.")
+                }
+                parameters += consumeTokenOrThrowError(TokenType.IDENTIFIER, "Expect parameter name.")
+            } while (tokens.getNextTokenIfItHasType(TokenType.COMMA))
+        }
+        consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+        consumeTokenOrThrowError(TokenType.LEFT_BRACE, "Expect '{' before $kind body.")
+        val body = block()
+        return Stmt.Function(name, parameters, body)
     }
 
     private fun varDeclaration(): Stmt {
@@ -105,7 +134,7 @@ class Parser(
         val breakToken = tokens.getPreviousToken()
         consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after 'break'.")
         if (!breakStack.peek()) {
-            error(breakToken, "'break' is only allowed inside a loop.")
+            throw reportErrorAndThrowParseException(breakToken, "'break' is only allowed inside a loop.")
         }
         return Stmt.Break
     }
@@ -202,9 +231,9 @@ class Parser(
                 val name = expr.name
                 expr = Expr.Assign(name, value)
             } else {
-                error(equals, "Invalid assignment target.")
+                throw reportErrorAndThrowParseException(equals, "Invalid assignment target.")
             }
-        } else {
+        } else if (!isParsingFunctionArguments) {
             while (tokens.getNextTokenIfItHasType(TokenType.COMMA)) {
                 val operator: Token = tokens.getPreviousToken()
                 val right: Expr = or()
@@ -247,10 +276,7 @@ class Parser(
     private fun comparison(): Expr {
         var expr: Expr = term()
         while (tokens.getNextTokenIfItHasType(
-                TokenType.GREATER,
-                TokenType.GREATER_EQUAL,
-                TokenType.LESS,
-                TokenType.LESS_EQUAL
+                TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL
             )
         ) {
             val operator: Token = tokens.getPreviousToken()
@@ -280,33 +306,61 @@ class Parser(
         return expr
     }
 
-    private fun unary(): Expr =
-        if (tokens.getNextTokenIfItHasType(TokenType.BANG, TokenType.MINUS)) {
-            val operator: Token = tokens.getPreviousToken()
-            val right = unary()
-            Expr.Unary(operator, right)
-        } else {
-            primary()
-        }
+    private fun unary(): Expr = if (tokens.getNextTokenIfItHasType(TokenType.BANG, TokenType.MINUS)) {
+        val operator: Token = tokens.getPreviousToken()
+        val right = unary()
+        Expr.Unary(operator, right)
+    } else {
+        call()
+    }
 
-    private fun primary(): Expr =
-        if (tokens.getNextTokenIfItHasType(TokenType.FALSE)) {
-            Expr.Literal(false)
-        } else if (tokens.getNextTokenIfItHasType(TokenType.TRUE)) {
-            Expr.Literal(true)
-        } else if (tokens.getNextTokenIfItHasType(TokenType.NIL)) {
-            Expr.Literal(null)
-        } else if (tokens.getNextTokenIfItHasType(TokenType.NUMBER, TokenType.STRING)) {
-            Expr.Literal(tokens.getPreviousToken().literal)
-        } else if (tokens.getNextTokenIfItHasType(TokenType.IDENTIFIER)) {
-            Expr.Variable(tokens.getPreviousToken())
-        } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_PAREN)) {
-            val expr = expression()
-            consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            Expr.Grouping(expr)
-        } else {
-            throw error(tokens.peekNextToken(), "Expect expression.")
+    private fun call(): Expr {
+        var expr: Expr = primary()
+        while (true) {
+            if (tokens.getNextTokenIfItHasType(TokenType.LEFT_PAREN)) {
+                isParsingFunctionArguments = true
+                expr = finishCall(expr)
+                isParsingFunctionArguments = false
+            } else {
+                break
+            }
         }
+        return expr
+    }
+
+    private fun finishCall(callee: Expr): Expr {
+        val arguments = mutableListOf<Expr>()
+        if (!tokens.nextTokenHasType(TokenType.RIGHT_PAREN)) {
+            do {
+                if (arguments.size >= FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE) {
+                    errorReporter.error(tokens.peekNextToken(), "Can't have more than 255 arguments.")
+                }
+                arguments += expression()
+            } while (tokens.getNextTokenIfItHasType(TokenType.COMMA))
+        }
+        val paren: Token = consumeTokenOrThrowError(
+            TokenType.RIGHT_PAREN, "Expect ')' after arguments."
+        )
+        return Expr.Call(callee, paren, arguments)
+    }
+
+    private fun primary(): Expr = if (tokens.getNextTokenIfItHasType(TokenType.FALSE)) {
+        Expr.Literal(false)
+    } else if (tokens.getNextTokenIfItHasType(TokenType.TRUE)) {
+        Expr.Literal(true)
+    } else if (tokens.getNextTokenIfItHasType(TokenType.NIL)) {
+        Expr.Literal(null)
+    } else if (tokens.getNextTokenIfItHasType(TokenType.NUMBER, TokenType.STRING)) {
+        Expr.Literal(tokens.getPreviousToken().literal)
+    } else if (tokens.getNextTokenIfItHasType(TokenType.IDENTIFIER)) {
+        Expr.Variable(tokens.getPreviousToken())
+    } else if (tokens.getNextTokenIfItHasType(TokenType.LEFT_PAREN)) {
+        val expr = expression()
+        consumeTokenOrThrowError(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+        Expr.Grouping(expr)
+    } else {
+        throw reportErrorAndThrowParseException(tokens.peekNextToken(), "Expect expression.")
+    }
 
     // Checks to see if the next token is of the expected type. If so, it consumes the token.
     // Otherwise, we report an error.
@@ -314,11 +368,11 @@ class Parser(
         if (tokens.nextTokenHasType(type)) {
             return tokens.getNextToken()
         } else {
-            throw error(tokens.peekNextToken(), errorMessage)
+            throw reportErrorAndThrowParseException(tokens.peekNextToken(), errorMessage)
         }
     }
 
-    private fun error(token: Token, errorMessage: String): ParseError {
+    private fun reportErrorAndThrowParseException(token: Token, errorMessage: String): ParseError {
         errorReporter.error(token, errorMessage)
         return ParseError()
     }
@@ -333,14 +387,7 @@ class Parser(
                 return
             }
             when (tokens.peekNextToken().type) {
-                TokenType.CLASS,
-                TokenType.FUN,
-                TokenType.VAR,
-                TokenType.FOR,
-                TokenType.IF,
-                TokenType.WHILE,
-                TokenType.PRINT,
-                TokenType.RETURN -> return
+                TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
             }
             tokens.getNextToken()
         }

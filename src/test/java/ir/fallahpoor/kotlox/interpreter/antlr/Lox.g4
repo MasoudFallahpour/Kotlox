@@ -4,8 +4,18 @@ program
     : declaration* EOF ;
 
 declaration
-    : varDecl
+    : funcDecl
+    | varDecl
     | statement ;
+
+funcDecl
+    : 'fun' function ;
+
+function
+    : IDENTIFIER '(' parameters? ')' block ;
+
+parameters
+    : IDENTIFIER (comma+=',' IDENTIFIER)* ;
 
 varDecl
     : 'var' IDENTIFIER ('=' expression)? ';' ;
@@ -67,7 +77,13 @@ factor
 
 unary
     : op+=('!' | '-') unary
-    | primary ;
+    | call ;
+
+call
+    : primary (leftParen+='(' arguments? rightParen+=')')* ;
+
+arguments
+    : expression (comma+=',' expression)* ;
 
 primary
     : NUMBER

@@ -27,6 +27,30 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitDeclaration(LoxParser.DeclarationContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link LoxParser#funcDecl}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitFuncDecl(LoxParser.FuncDeclContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#function}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitFunction(LoxParser.FunctionContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#parameters}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitParameters(LoxParser.ParametersContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link LoxParser#varDecl}.
      *
      * @param ctx the parse tree
@@ -43,12 +67,12 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitStatement(LoxParser.StatementContext ctx);
 
     /**
-     * Visit a parse tree produced by {@link LoxParser#exprStmt}.
+     * Visit a parse tree produced by {@link LoxParser#ifStmt}.
      *
      * @param ctx the parse tree
      * @return the visitor result
      */
-    T visitExprStmt(LoxParser.ExprStmtContext ctx);
+    T visitIfStmt(LoxParser.IfStmtContext ctx);
 
     /**
      * Visit a parse tree produced by {@link LoxParser#forStmt}.
@@ -59,28 +83,20 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitForStmt(LoxParser.ForStmtContext ctx);
 
     /**
-     * Visit a parse tree produced by {@link LoxParser#ifStmt}.
-     *
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    T visitIfStmt(LoxParser.IfStmtContext ctx);
-
-    /**
-     * Visit a parse tree produced by {@link LoxParser#printStmt}.
-     *
-     * @param ctx the parse tree
-     * @return the visitor result
-     */
-    T visitPrintStmt(LoxParser.PrintStmtContext ctx);
-
-    /**
      * Visit a parse tree produced by {@link LoxParser#whileStmt}.
      *
      * @param ctx the parse tree
      * @return the visitor result
      */
     T visitWhileStmt(LoxParser.WhileStmtContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#breakStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitBreakStmt(LoxParser.BreakStmtContext ctx);
 
     /**
      * Visit a parse tree produced by {@link LoxParser#block}.
@@ -91,12 +107,20 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitBlock(LoxParser.BlockContext ctx);
 
     /**
-     * Visit a parse tree produced by {@link LoxParser#breakStmt}.
+     * Visit a parse tree produced by {@link LoxParser#printStmt}.
      *
      * @param ctx the parse tree
      * @return the visitor result
      */
-    T visitBreakStmt(LoxParser.BreakStmtContext ctx);
+    T visitPrintStmt(LoxParser.PrintStmtContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#exprStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitExprStmt(LoxParser.ExprStmtContext ctx);
 
     /**
      * Visit a parse tree produced by {@link LoxParser#expression}.
@@ -169,6 +193,22 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
      * @return the visitor result
      */
     T visitUnary(LoxParser.UnaryContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#call}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitCall(LoxParser.CallContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link LoxParser#arguments}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitArguments(LoxParser.ArgumentsContext ctx);
 
     /**
      * Visit a parse tree produced by {@link LoxParser#primary}.

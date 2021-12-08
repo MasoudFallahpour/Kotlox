@@ -1,6 +1,5 @@
-package ir.fallahpoor.kotlox.interpreter
+package ir.fallahpoor.kotlox.interpreter.interpreter
 
-import ir.fallahpoor.kotlox.interpreter.interpreter.RuntimeError
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 
 class Environment(private val parentEnvironment: Environment? = null) {

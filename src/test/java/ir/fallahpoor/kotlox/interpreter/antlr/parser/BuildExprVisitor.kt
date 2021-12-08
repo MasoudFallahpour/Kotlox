@@ -1,5 +1,6 @@
 package ir.fallahpoor.kotlox.interpreter.antlr.parser
 
+import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 import ir.fallahpoor.kotlox.interpreter.Expr
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxBaseVisitor
 import ir.fallahpoor.kotlox.interpreter.antlr.LoxLexer
@@ -9,12 +10,17 @@ import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 
 // TODO should we throw exceptions?
 
-class BuildExprVisitor : LoxBaseVisitor<Expr>() {
+class BuildExprVisitor(
+    private val errorReporter: ErrorReporter
+) : LoxBaseVisitor<Expr>() {
 
     companion object {
         private val NUMBER_REGEX = "\\d+(.\\d+)?".toRegex()
         private val STRING_WITH_DOUBLE_QUOTES_REGEX = "\"[^\"]*\"".toRegex()
+        private const val FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE = 255
     }
+
+    private var isParsingFunctionArguments = false
 
     override fun visitExpression(ctx: LoxParser.ExpressionContext): Expr =
         visitAssignment(ctx.assignment())
@@ -29,9 +35,9 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
                 ctx.IDENTIFIER().symbol.line
             )
             Expr.Assign(name, value)
-        } else {
+        } else if (!isParsingFunctionArguments) {
             var expr: Expr = visitLogicOr(ctx.logicOr(0))
-            for (i in 0..ctx.op.lastIndex) {
+            for (i in ctx.op.indices) {
                 expr = createOrExpr(
                     currentExpr = expr,
                     ctx.op[i],
@@ -39,6 +45,8 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
                 )
             }
             expr
+        } else {
+            visitChildren(ctx)
         }
 
     private fun createOrExpr(
@@ -53,7 +61,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
 
     override fun visitLogicOr(ctx: LoxParser.LogicOrContext): Expr {
         var expr: Expr = visitLogicAnd(ctx.logicAnd(0))
-        for (i in 0..ctx.or.lastIndex) {
+        for (i in ctx.or.indices) {
             expr = createAndExpr(
                 currentExpr = expr,
                 token = ctx.or[i],
@@ -75,7 +83,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
 
     override fun visitLogicAnd(ctx: LoxParser.LogicAndContext): Expr {
         var expr: Expr = visitEquality(ctx.equality(0))
-        for (i in 0..ctx.and.lastIndex) {
+        for (i in ctx.and.indices) {
             expr = createEqualityExpr(
                 currentExpr = expr,
                 token = ctx.and[i],
@@ -97,7 +105,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
 
     override fun visitEquality(ctx: LoxParser.EqualityContext): Expr {
         var expr: Expr = visitComparison(ctx.comparison(0))
-        for (i in 0..ctx.op.lastIndex) {
+        for (i in ctx.op.indices) {
             expr = createComparisonExpr(
                 currentExpr = expr,
                 token = ctx.op[i],
@@ -129,7 +137,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
 
     override fun visitComparison(ctx: LoxParser.ComparisonContext): Expr {
         var expr: Expr = visitTerm(ctx.term(0))
-        for (i in 0..ctx.op.lastIndex) {
+        for (i in ctx.op.indices) {
             expr = createTermExpr(
                 currentExpr = expr,
                 token = ctx.op[i],
@@ -173,7 +181,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
 
     override fun visitTerm(ctx: LoxParser.TermContext): Expr {
         var expr: Expr = visitFactor(ctx.factor(0))
-        for (i in 0..ctx.op.lastIndex) {
+        for (i in ctx.op.indices) {
             expr = createFactorExpr(
                 currentExpr = expr,
                 token = ctx.op[i],
@@ -205,7 +213,7 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
 
     override fun visitFactor(ctx: LoxParser.FactorContext): Expr {
         var expr: Expr = visitUnary(ctx.unary(0))
-        for (i in 0..ctx.op.lastIndex) {
+        for (i in ctx.op.indices) {
             expr = createUnaryExpr(
                 currentExpr = expr,
                 token = ctx.op[i],
@@ -236,11 +244,42 @@ class BuildExprVisitor : LoxBaseVisitor<Expr>() {
     }
 
     override fun visitUnary(ctx: LoxParser.UnaryContext): Expr =
-        if (ctx.unary() == null) {
-            visitPrimary(ctx.primary())
-        } else {
+        if (ctx.unary() != null) {
             createPrimary(ctx.op[0], ctx)
+        } else {
+            visitCall(ctx.call())
         }
+
+    override fun visitCall(ctx: LoxParser.CallContext): Expr {
+        var expr: Expr = visitPrimary(ctx.primary())
+        if (ctx.leftParen.isNotEmpty()) {
+            for (i in ctx.leftParen.indices) {
+                isParsingFunctionArguments = true
+                val rightParen = Token(TokenType.RIGHT_PAREN, ")", null, ctx.rightParen[i].line)
+                expr = finishCall(expr, ctx.arguments(i), rightParen)
+                isParsingFunctionArguments = false
+            }
+        }
+        return expr
+    }
+
+    private fun finishCall(callee: Expr, ctx: LoxParser.ArgumentsContext?, rightParen: Token): Expr {
+        return if (ctx == null) {
+            Expr.Call(callee, rightParen, emptyList())
+        } else {
+            val arguments = mutableListOf<Expr>().apply {
+                add(visitExpression(ctx.expression(0)))
+            }
+            for (i in ctx.comma.indices) {
+                if (arguments.size >= FUNCTION_CALL_MAX_ARGUMENT_LIST_SIZE) {
+                    val token = Token(TokenType.COMMA, ",", null, ctx.comma[i].line)
+                    errorReporter.error(token, "Can't have more than 255 parameters.")
+                }
+                arguments += visitExpression(ctx.expression(i + 1))
+            }
+            Expr.Call(callee, rightParen, arguments)
+        }
+    }
 
     private fun createPrimary(
         token: org.antlr.v4.runtime.Token,
