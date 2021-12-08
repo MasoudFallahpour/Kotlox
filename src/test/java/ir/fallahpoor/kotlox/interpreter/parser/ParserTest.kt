@@ -371,33 +371,6 @@ class ParserTest {
 
     }
 
-    @Test
-    fun testWhile() {
-
-        // Given
-        val source =
-            """var c = 0;
-               while (c < 3) print c = c + 1;           
-               var a = 0;
-               while (a < 3) {
-                   print a;
-                   a = a + 1;
-               }
-               while (false) if (true) 1; else 2;
-               while (false) while (true) 1;
-               while (false) for (;;) 1;
-             """
-
-        // When
-        val actualStatements: List<Stmt> = parseSource(source)
-
-        // Then
-        val expectedStatements: List<Stmt> = AntlrParser.parserSource(source)
-        Truth.assertThat(actualStatements).isEqualTo(expectedStatements)
-        Mockito.verifyNoInteractions(errorReporter)
-
-    }
-
     private fun parseSource(source: String): List<Stmt> {
         val parser = createParser(source)
         return parser.parse()
