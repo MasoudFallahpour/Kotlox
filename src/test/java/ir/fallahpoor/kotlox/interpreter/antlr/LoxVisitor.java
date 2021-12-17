@@ -123,6 +123,14 @@ public interface LoxVisitor<T> extends ParseTreeVisitor<T> {
     T visitExprStmt(LoxParser.ExprStmtContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link LoxParser#returnStmt}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitReturnStmt(LoxParser.ReturnStmtContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link LoxParser#expression}.
      *
      * @param ctx the parse tree

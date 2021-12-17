@@ -27,7 +27,8 @@ statement
     | breakStmt
     | block
     | printStmt
-    | exprStmt ;
+    | exprStmt
+    | returnStmt;
 
 ifStmt
     : 'if' '(' expression ')' thenBranch=statement ('else' elseBranch=statement)? ;
@@ -49,6 +50,9 @@ printStmt
 
 exprStmt
     : expression ';' ;
+
+returnStmt
+    : ret='return' expression? ';' ;
 
 expression
     : assignment ;

@@ -126,6 +126,8 @@ class BuildStmtVisitor(
             statements = visitBlock(ctx.block())
         } else if (ctx.printStmt() != null) {
             statements = visitPrintStmt(ctx.printStmt())
+        } else if (ctx.returnStmt() != null) {
+            statements = visitReturnStmt(ctx.returnStmt())
         } else if (ctx.exprStmt() != null) {
             statements = visitExprStmt(ctx.exprStmt())
         } else {
@@ -218,6 +220,16 @@ class BuildStmtVisitor(
     override fun visitPrintStmt(ctx: LoxParser.PrintStmtContext): List<Stmt> {
         val expr: Expr = buildExprVisitor.visitExpression(ctx.expression())
         return listOf(Stmt.Print(expr))
+    }
+
+    override fun visitReturnStmt(ctx: LoxParser.ReturnStmtContext): List<Stmt> {
+        val value: Expr? = if (ctx.expression() == null) {
+            null
+        } else {
+            buildExprVisitor.visitExpression(ctx.expression())
+        }
+        val keyword = Token(TokenType.RETURN, "return", null, ctx.ret.line)
+        return listOf(Stmt.Return(keyword, value))
     }
 
     override fun visitExprStmt(ctx: LoxParser.ExprStmtContext): List<Stmt> {

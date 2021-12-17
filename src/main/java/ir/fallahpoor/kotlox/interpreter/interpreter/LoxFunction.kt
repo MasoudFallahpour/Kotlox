@@ -16,8 +16,12 @@ class LoxFunction(private val declaration: Stmt.Function) : LoxCallable {
                 argument
             )
         }
-        interpreter.executeBlock(declaration.body, environment)
-        return null
+        return try {
+            interpreter.executeBlock(declaration.body, environment)
+            null
+        } catch (returnValue: Interpreter.ReturnException) {
+            returnValue.value
+        }
     }
 
     override fun toString(): String = "<fn " + declaration.name.lexeme + ">"

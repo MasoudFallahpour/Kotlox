@@ -14,6 +14,7 @@ class Interpreter(
 ) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
     private class BreakException : RuntimeException()
+    class ReturnException(val value: Any?) : RuntimeException()
 
     companion object {
         private const val ERROR_MESSAGE_INCOMPATIBLE_TYPES = "Operands are incompatible."
@@ -237,6 +238,15 @@ class Interpreter(
     override fun visitPrintStmt(stmt: Stmt.Print) {
         val value: Any? = evaluate(stmt.expression)
         printer.println(stringify(value))
+    }
+
+    override fun visitReturnStmt(stmt: Stmt.Return) {
+        val value: Any? = if (stmt.value != null) {
+            evaluate(stmt.value)
+        } else {
+            null
+        }
+        throw ReturnException(value)
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {

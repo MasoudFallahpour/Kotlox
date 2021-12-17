@@ -18,11 +18,12 @@ import java.util.*
  * function    -> IDENTIFIER "(" parameters? ")" block
  * parameters  -> IDENTIFIER ( "," IDENTIFIER )*
  * varDecl     -> "var" IDENTIFIER ("=" expression)? ";"
- * statement   -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block | breakStmt
+ * statement   -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block | breakStmt
  * exprStmt    -> expression ";"
  * forStmt     -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement
  * ifStmt      -> "if" "(" expression ")" statement ("else" statement)?
  * printStmt   -> "print" expression ";"
+ * returnStmt  -> "return" expression? ";"
  * whileStmt   -> "while" "(" expression ")" statement
  * block       -> "{" declaration* "}"
  * breakStmt   -> "break" ";"
@@ -118,6 +119,8 @@ class Parser(
             stmt = ifStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.PRINT)) {
             stmt = printStatement()
+        } else if (tokens.getNextTokenIfItHasType(TokenType.RETURN)) {
+            stmt = returnStatement()
         } else if (tokens.getNextTokenIfItHasType(TokenType.WHILE)) {
             breakStack.push(true)
             stmt = whileStatement()
@@ -192,6 +195,17 @@ class Parser(
         val value = expression()
         consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Print(value)
+    }
+
+    private fun returnStatement(): Stmt {
+        val keyword: Token = tokens.getPreviousToken()
+        val value: Expr? = if (tokens.nextTokenHasType(TokenType.SEMICOLON)) {
+            null
+        } else {
+            expression()
+        }
+        consumeTokenOrThrowError(TokenType.SEMICOLON, "Expect ';' after return value.")
+        return Stmt.Return(keyword, value)
     }
 
     private fun whileStatement(): Stmt {
