@@ -157,16 +157,16 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     private fun number() {
 
-        while (isDigit(peekNextChar())) {
+        while (peekNextChar().isDigit()) {
             getNextChar()
         }
 
         // Look for a fractional part.
-        if (peekNextChar() == Chars.DOT && isDigit(peekNextNextChar())) {
+        if (peekNextChar() == Chars.DOT && peekNextNextChar().isDigit()) {
             // Consume the "."
             getNextChar()
 
-            while (isDigit(peekNextChar())) {
+            while (peekNextChar().isDigit()) {
                 getNextChar()
             }
         }
@@ -179,7 +179,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     private fun identifier() {
 
-        while (isAlphaNumeric(peekNextChar())) {
+        while (peekNextChar().isAlphaNumeric()) {
             getNextChar()
         }
 
@@ -190,13 +190,13 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     }
 
-    private fun isAlpha(c: Char): Boolean =
-        c in Chars.ALPHA_LOWER_CASE ||
-                c in Chars.ALPHA_UPPER_CASE ||
-                c == Chars.UNDERSCORE
+    private fun Char.isAlpha(): Boolean =
+        this in Chars.ALPHA_LOWER_CASE ||
+                this in Chars.ALPHA_UPPER_CASE ||
+                this == Chars.UNDERSCORE
 
-    private fun isAlphaNumeric(c: Char): Boolean = isAlpha(c) || isDigit(c)
+    private fun Char.isAlphaNumeric(): Boolean = isAlpha() || isDigit()
 
-    private fun isDigit(c: Char): Boolean = c in Chars.DIGITS
+    private fun Char.isDigit(): Boolean = this in Chars.DIGITS
 
 }
