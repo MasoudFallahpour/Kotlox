@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
-    kotlin("jvm") version "1.6.0"
-    id("org.jetbrains.kotlinx.kover") version "0.4.4"
+    kotlin("jvm") version "1.8.21"
+    id("org.jetbrains.kotlinx.kover") version "0.6.1"
 }
 
 group = "ir.fallahpoor"
@@ -14,9 +14,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     testImplementation("com.google.truth:truth:1.1.3")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.21")
     testImplementation("org.mockito:mockito-inline:4.1.0")
     testImplementation("org.antlr:antlr4-runtime:4.9.3")
 }
