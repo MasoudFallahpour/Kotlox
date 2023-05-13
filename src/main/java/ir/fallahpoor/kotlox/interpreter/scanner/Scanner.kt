@@ -50,9 +50,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
                     else -> addToken(TokenType.SLASH)
                 }
             }
+
             Chars.SPACE, Chars.RETURN, Chars.TAB -> {
                 // Ignore whitespace
             }
+
             Chars.NEW_LINE -> line++
             Chars.DOUBLE_QUOTES -> string()
             in Chars.DIGITS -> number()
@@ -70,33 +72,32 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     // Look ahead the next char. If it matches the given 'expected' char then consume it and return true,
     // otherwise don't consume it and return false.
-    private fun nextCharMatches(expected: Char): Boolean =
-        if (isAtEnd()) {
-            false
-        } else if (source[currentCharIndex] != expected) {
-            false
-        } else {
-            currentCharIndex++
-            true
-        }
+    private fun nextCharMatches(expected: Char): Boolean = if (isAtEnd()) {
+        false
+    } else if (source[currentCharIndex] != expected) {
+        false
+    } else {
+        currentCharIndex++
+        true
+    }
 
     // Get the next char without consuming it.
-    private fun peekNextChar(): Char =
-        if (isAtEnd()) {
-            // TODO check to see if the following char is correct because the original text has is as '\0'
-            '\u0000'
-        } else {
-            source[currentCharIndex]
-        }
+    private fun peekNextChar(): Char = if (isAtEnd()) {
+        // TODO Verify that the following Unicode char is the correct character to use because the original
+        //  character from the source code of the book is '\0'
+        '\u0000'
+    } else {
+        source[currentCharIndex]
+    }
 
     // Get the char after the next character without consuming it.
-    private fun peekNextNextChar(): Char =
-        if (currentCharIndex + 1 >= source.length) {
-            // TODO check to see if the following char is correct because the original text has is as '\0'
-            '\u0000'
-        } else {
-            source[currentCharIndex + 1]
-        }
+    private fun peekNextNextChar(): Char = if (currentCharIndex + 1 >= source.length) {
+        // TODO Verify that the following Unicode char is the correct character to use because the original
+        //  character from the source code of the book is '\0'
+        '\u0000'
+    } else {
+        source[currentCharIndex + 1]
+    }
 
     private fun lineComment() {
         // A comment goes until the end of the line.
@@ -106,7 +107,6 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     }
 
     private fun blockComment() {
-
         var blockCommentConsumed = false
 
         while (!blockCommentConsumed && !isAtEnd()) {
@@ -123,11 +123,9 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         if (!blockCommentConsumed) {
             errorReporter.error(line, ErrorReporter.Error.UnterminatedBlockComment)
         }
-
     }
 
     private fun string() {
-
         var startLine = line
 
         while (peekNextChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
@@ -152,11 +150,9 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         addToken(TokenType.STRING, literal)
 
         line = startLine
-
     }
 
     private fun number() {
-
         while (peekNextChar().isDigit()) {
             getNextChar()
         }
@@ -174,11 +170,9 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         val literal = source.substring(lexemeStartIndex, currentCharIndex)
 
         addToken(TokenType.NUMBER, literal.toDouble())
-
     }
 
     private fun identifier() {
-
         while (peekNextChar().isAlphaNumeric()) {
             getNextChar()
         }
@@ -187,7 +181,6 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         val tokenType: TokenType = Keywords.get(text) ?: TokenType.IDENTIFIER
 
         addToken(tokenType)
-
     }
 
     private fun Char.isAlpha(): Boolean =
