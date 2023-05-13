@@ -13,7 +13,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     private var currentCharIndex = 0
 
     // Tracks what source line 'currentCharIndex' is on
-    private var line = 1
+    private var currentLineNumber = 1
 
     fun scanTokens(): List<Token> {
         while (!isAtEnd()) {
@@ -21,7 +21,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             lexemeStartIndex = currentCharIndex
             scanToken()
         }
-        tokens += Token(TokenType.EOF, "", null, line)
+        tokens += Token(type = TokenType.EOF, lexeme = "", literal = null, line = currentLineNumber)
         return tokens
     }
 
@@ -55,11 +55,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
                 // Ignore whitespace
             }
 
-            Chars.NEW_LINE -> line++
+            Chars.NEW_LINE -> currentLineNumber++
             Chars.DOUBLE_QUOTES -> string()
             in Chars.DIGITS -> number()
             in Chars.ALPHA_LOWER_CASE, in Chars.ALPHA_UPPER_CASE, Chars.UNDERSCORE -> identifier()
-            else -> errorReporter.error(line, ErrorReporter.Error.UnexpectedChar(char))
+            else -> errorReporter.error(currentLineNumber, ErrorReporter.Error.UnexpectedChar(char))
         }
     }
 
@@ -67,7 +67,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     private fun addToken(type: TokenType, literal: Any? = null) {
         val text = source.substring(lexemeStartIndex, currentCharIndex)
-        tokens += Token(type, text, literal, line)
+        tokens += Token(type = type, lexeme = text, literal = literal, line = currentLineNumber)
     }
 
     // Look ahead the next char. If it matches the given 'expected' char then consume it and return true,
@@ -90,7 +90,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         source[currentCharIndex]
     }
 
-    // Get the char after the next character without consuming it.
+    // Get the character after the next character without consuming it.
     private fun peekNextNextChar(): Char = if (currentCharIndex + 1 >= source.length) {
         // TODO Verify that the following Unicode char is the correct character to use because the original
         //  character from the source code of the book is '\0'
@@ -111,7 +111,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
         while (!blockCommentConsumed && !isAtEnd()) {
             if (peekNextChar() == Chars.NEW_LINE) {
-                line++
+                currentLineNumber++
                 getNextChar()
             } else if (getNextChar() == Chars.STAR) {
                 if (getNextChar() == Chars.SLASH) {
@@ -121,12 +121,12 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         if (!blockCommentConsumed) {
-            errorReporter.error(line, ErrorReporter.Error.UnterminatedBlockComment)
+            errorReporter.error(currentLineNumber, ErrorReporter.Error.UnterminatedBlockComment)
         }
     }
 
     private fun string() {
-        var startLine = line
+        var startLine = currentLineNumber
 
         while (peekNextChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
             if (peekNextChar() == Chars.NEW_LINE) {
@@ -136,7 +136,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         if (isAtEnd()) {
-            errorReporter.error(line, ErrorReporter.Error.UnterminatedString)
+            errorReporter.error(currentLineNumber, ErrorReporter.Error.UnterminatedString)
             return
         }
 
@@ -149,7 +149,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
         addToken(TokenType.STRING, literal)
 
-        line = startLine
+        currentLineNumber = startLine
     }
 
     private fun number() {
