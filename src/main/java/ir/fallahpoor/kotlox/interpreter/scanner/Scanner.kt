@@ -21,7 +21,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             lexemeStartIndex = currentCharIndex
             scanToken()
         }
-        tokens += Token(type = TokenType.EOF, lexeme = "", literal = null, line = currentLineNumber)
+        tokens += Token(type = TokenType.EOF, lexeme = "", literal = null, lineNumber = currentLineNumber)
         return tokens
     }
 
@@ -67,7 +67,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     private fun addToken(type: TokenType, literal: Any? = null) {
         val text = source.substring(lexemeStartIndex, currentCharIndex)
-        tokens += Token(type = type, lexeme = text, literal = literal, line = currentLineNumber)
+        tokens += Token(type = type, lexeme = text, literal = literal, lineNumber = currentLineNumber)
     }
 
     // Look ahead the next char. If it matches the given 'expected' char then consume it and return true,

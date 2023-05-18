@@ -18,7 +18,7 @@ class ErrorReporter(
     var hadRuntimeError = false
 
     fun runtimeError(error: RuntimeError) {
-        printer.printlnError("[line " + error.token.line + "] " + error.message)
+        printer.printlnError("[line " + error.token.lineNumber + "] " + error.message)
         hadRuntimeError = true
     }
 
@@ -28,9 +28,9 @@ class ErrorReporter(
 
     fun error(token: Token, message: String) {
         if (token.type == TokenType.EOF) {
-            report(token.line, " at end", message)
+            report(token.lineNumber, " at end", message)
         } else {
-            report(token.line, " at '" + token.lexeme + "'", message)
+            report(token.lineNumber, " at '" + token.lexeme + "'", message)
         }
     }
 

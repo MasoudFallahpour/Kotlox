@@ -56,7 +56,7 @@ class BuildStmtVisitor(
             type = TokenType.IDENTIFIER,
             lexeme = ctx.IDENTIFIER().symbol.text,
             literal = null,
-            line = ctx.IDENTIFIER().symbol.line
+            lineNumber = ctx.IDENTIFIER().symbol.line
         )
         val functionBody: List<Stmt> = visitBlock(ctx.block())
         return listOf(
@@ -94,7 +94,7 @@ class BuildStmtVisitor(
             type = TokenType.IDENTIFIER,
             lexeme = identifier.symbol.text,
             literal = null,
-            line = identifier.symbol.line
+            lineNumber = identifier.symbol.line
         )
 
     override fun visitVarDecl(ctx: LoxParser.VarDeclContext): List<Stmt> {
