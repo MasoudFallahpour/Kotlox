@@ -5,7 +5,7 @@ Kotlox (WIP)
 Kotlox is an interpreter for the [Lox programming language](https://craftinginterpreters.com/the-lox-language.html),
 written in Kotlin/JVM.
 
-It's not a mere "IntelliJ IDEA -> menu -> code -> Convert Java File to Kotlin File" conversion of the reference
+It's not a mere "IntelliJ IDEA menu -> Refactor -> Convert to Kotlin" conversion of the reference
 Java [implementation](https://github.com/munificent/craftinginterpreters/tree/master/java/com/craftinginterpreters/lox)!
 Each line of Kotlox is handcrafted. That's the reason why the implementation of Kotlox does not match the reference Java
 implementation.
