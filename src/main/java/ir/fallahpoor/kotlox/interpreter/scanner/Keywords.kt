@@ -40,6 +40,6 @@ object Keywords {
         BREAK to TokenType.BREAK
     )
 
-    fun get(text: String): TokenType? = keywords[text]
+    fun getTokenTypeFor(lexeme: String): TokenType? = keywords[lexeme]
 
 }

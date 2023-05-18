@@ -28,7 +28,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     private fun isAtEnd() = currentCharIndex >= source.length
 
     private fun scanToken() {
-        when (val char = getNextChar()) {
+        when (val char = consumeCurrentChar()) {
             Chars.LEFT_PAREN -> addToken(TokenType.LEFT_PAREN)
             Chars.RIGHT_PAREN -> addToken(TokenType.RIGHT_PAREN)
             Chars.LEFT_BRACE -> addToken(TokenType.LEFT_BRACE)
@@ -59,11 +59,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             Chars.DOUBLE_QUOTES -> string()
             in Chars.DIGITS -> number()
             in Chars.ALPHA_LOWER_CASE, in Chars.ALPHA_UPPER_CASE, Chars.UNDERSCORE -> identifier()
-            else -> errorReporter.error(currentLineNumber, ErrorReporter.Error.UnexpectedChar(char))
+            else -> errorReporter.error(line = currentLineNumber, error = ErrorReporter.Error.UnexpectedChar(char))
         }
     }
 
-    private fun getNextChar(): Char = source[currentCharIndex++]
+    private fun consumeCurrentChar(): Char = source[currentCharIndex++]
 
     private fun addToken(type: TokenType, literal: Any? = null) {
         val text = source.substring(lexemeStartIndex, currentCharIndex)
@@ -82,7 +82,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     }
 
     // Get the next char without consuming it.
-    private fun peekNextChar(): Char = if (isAtEnd()) {
+    private fun peekCurrentChar(): Char = if (isAtEnd()) {
         // TODO Verify that the following Unicode char is the correct character to use because the original
         //  character from the source code of the book is '\0'
         '\u0000'
@@ -91,7 +91,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     }
 
     // Get the character after the next character without consuming it.
-    private fun peekNextNextChar(): Char = if (currentCharIndex + 1 >= source.length) {
+    private fun peekNextChar(): Char = if (currentCharIndex + 1 >= source.length) {
         // TODO Verify that the following Unicode char is the correct character to use because the original
         //  character from the source code of the book is '\0'
         '\u0000'
@@ -101,8 +101,8 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
 
     private fun lineComment() {
         // A comment goes until the end of the line.
-        while (peekNextChar() != Chars.NEW_LINE && !isAtEnd()) {
-            getNextChar()
+        while (peekCurrentChar() != Chars.NEW_LINE && !isAtEnd()) {
+            consumeCurrentChar()
         }
     }
 
@@ -110,11 +110,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         var blockCommentConsumed = false
 
         while (!blockCommentConsumed && !isAtEnd()) {
-            if (peekNextChar() == Chars.NEW_LINE) {
+            if (peekCurrentChar() == Chars.NEW_LINE) {
                 currentLineNumber++
-                getNextChar()
-            } else if (getNextChar() == Chars.STAR) {
-                if (getNextChar() == Chars.SLASH) {
+                consumeCurrentChar()
+            } else if (consumeCurrentChar() == Chars.STAR) {
+                if (consumeCurrentChar() == Chars.SLASH) {
                     blockCommentConsumed = true
                 }
             }
@@ -128,11 +128,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     private fun string() {
         var startLine = currentLineNumber
 
-        while (peekNextChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
-            if (peekNextChar() == Chars.NEW_LINE) {
+        while (peekCurrentChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
+            if (peekCurrentChar() == Chars.NEW_LINE) {
                 startLine++
             }
-            getNextChar()
+            consumeCurrentChar()
         }
 
         if (isAtEnd()) {
@@ -141,44 +141,44 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         // The closing "
-        getNextChar()
+        consumeCurrentChar()
 
-        // Trim the surrounding quotes.
         // If Lox supported escape sequences like \n, we’d unescape those here.
+        // Get rid of the surrounding quotes.
         val literal = source.substring(lexemeStartIndex + 1, currentCharIndex - 1)
 
-        addToken(TokenType.STRING, literal)
+        addToken(type = TokenType.STRING, literal = literal)
 
         currentLineNumber = startLine
     }
 
     private fun number() {
-        while (peekNextChar().isDigit()) {
-            getNextChar()
+        while (peekCurrentChar().isDigit()) {
+            consumeCurrentChar()
         }
 
         // Look for a fractional part.
-        if (peekNextChar() == Chars.DOT && peekNextNextChar().isDigit()) {
+        if (peekCurrentChar() == Chars.DOT && peekNextChar().isDigit()) {
             // Consume the "."
-            getNextChar()
+            consumeCurrentChar()
 
-            while (peekNextChar().isDigit()) {
-                getNextChar()
+            while (peekCurrentChar().isDigit()) {
+                consumeCurrentChar()
             }
         }
 
         val literal = source.substring(lexemeStartIndex, currentCharIndex)
 
-        addToken(TokenType.NUMBER, literal.toDouble())
+        addToken(type = TokenType.NUMBER, literal = literal.toDouble())
     }
 
     private fun identifier() {
-        while (peekNextChar().isAlphaNumeric()) {
-            getNextChar()
+        while (peekCurrentChar().isAlphaNumeric()) {
+            consumeCurrentChar()
         }
 
-        val text = source.substring(lexemeStartIndex, currentCharIndex)
-        val tokenType: TokenType = Keywords.get(text) ?: TokenType.IDENTIFIER
+        val lexeme = source.substring(lexemeStartIndex, currentCharIndex)
+        val tokenType: TokenType = Keywords.getTokenTypeFor(lexeme) ?: TokenType.IDENTIFIER
 
         addToken(tokenType)
     }
