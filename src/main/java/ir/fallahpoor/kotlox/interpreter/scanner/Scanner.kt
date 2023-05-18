@@ -31,7 +31,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         when (val char = getNextChar()) {
             Chars.LEFT_PAREN -> addToken(TokenType.LEFT_PAREN)
             Chars.RIGHT_PAREN -> addToken(TokenType.RIGHT_PAREN)
-            Chars.LEFt_BRACE -> addToken(TokenType.LEFT_BRACE)
+            Chars.LEFT_BRACE -> addToken(TokenType.LEFT_BRACE)
             Chars.RIGHT_BRACE -> addToken(TokenType.RIGHT_BRACE)
             Chars.COMMA -> addToken(TokenType.COMMA)
             Chars.DOT -> addToken(TokenType.DOT)

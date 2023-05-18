@@ -10,7 +10,7 @@ object Chars {
     const val DOT = '.'
     const val LEFT_PAREN = '('
     const val RIGHT_PAREN = ')'
-    const val LEFt_BRACE = '{'
+    const val LEFT_BRACE = '{'
     const val RIGHT_BRACE = '}'
     const val COMMA = ','
     const val MINUS = '-'
