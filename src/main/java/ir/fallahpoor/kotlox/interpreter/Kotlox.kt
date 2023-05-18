@@ -5,6 +5,7 @@ import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -16,13 +17,9 @@ class Lox(private val commandLineArgs: Array<String>) {
     private val interpreter = Interpreter(errorReporter, Printer())
 
     private object ErrorCode {
-        // Wrong number of arguments when invoking Kotlox
         const val WRONG_USAGE = 64
-
-        // Syntax error
         const val WRONG_SYNTAX = 65
-
-        // Internal error like adding a number to a string
+        const val NON_EXISTENT_INPUT_FILE = 66
         const val RUNTIME_ERROR = 70
     }
 
@@ -51,16 +48,22 @@ class Lox(private val commandLineArgs: Array<String>) {
         }
     }
 
-    @Throws(IOException::class)
-    private fun runFile(path: String) {
-        val source = String(Files.readAllBytes(Paths.get(path)))
-        run(source)
+    private fun runFile(filePath: String) {
+        val sourceCode: String = readFileAsString(filePath)
+        run(sourceCode)
         if (errorReporter.hadError) {
             exitProcess(ErrorCode.WRONG_SYNTAX)
         }
         if (errorReporter.hadRuntimeError) {
             exitProcess(ErrorCode.RUNTIME_ERROR)
         }
+    }
+
+    private fun readFileAsString(filePath: String): String = try {
+        String(Files.readAllBytes(Paths.get(filePath)))
+    } catch (ex: FileNotFoundException) {
+        println("Could not find file $filePath")
+        exitProcess(ErrorCode.NON_EXISTENT_INPUT_FILE)
     }
 
     private fun run(source: String) {
