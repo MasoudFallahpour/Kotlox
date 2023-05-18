@@ -7,12 +7,12 @@ data class Token(
     val lineNumber: Int
 ) {
     override fun toString(): String {
-        val lex = if (lexeme.isNotBlank()) {
+        val lexeme = if (lexeme.isNotBlank()) {
             ", lexeme = $lexeme"
         } else {
             ""
         }
-        val lit = if (literal != null) {
+        val literal = if (literal != null) {
             ", literal = $literal"
         } else {
             ""
@@ -20,8 +20,8 @@ data class Token(
         return "$" +
                 "line = $lineNumber, " +
                 "type = $type" +
-                lex +
-                lit +
+                lexeme +
+                literal +
                 "$"
     }
 }
