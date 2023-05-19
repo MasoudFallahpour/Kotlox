@@ -45,7 +45,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             Chars.GREATER -> addToken(if (nextCharMatches(Chars.EQUAL)) TokenType.GREATER_EQUAL else TokenType.GREATER)
             Chars.SLASH -> {
                 when {
-                    nextCharMatches(Chars.SLASH) -> lineComment()
+                    nextCharMatches(Chars.SLASH) -> scanLineComment()
                     nextCharMatches(Chars.STAR) -> scanBlockComment()
                     else -> addToken(TokenType.SLASH)
                 }
@@ -56,9 +56,9 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             }
 
             Chars.NEW_LINE -> currentLineNumber++
-            Chars.DOUBLE_QUOTES -> string()
-            in Chars.DIGITS -> number()
-            in Chars.ALPHA_LOWER_CASE, in Chars.ALPHA_UPPER_CASE, Chars.UNDERSCORE -> identifier()
+            Chars.DOUBLE_QUOTES -> scanString()
+            in Chars.DIGITS -> scanNumber()
+            in Chars.ALPHA_LOWER_CASE, in Chars.ALPHA_UPPER_CASE, Chars.UNDERSCORE -> scanIdentifier()
             else -> errorReporter.error(line = currentLineNumber, error = ErrorReporter.Error.UnexpectedChar(char))
         }
     }
@@ -99,7 +99,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         source[nextCharIndex + 1]
     }
 
-    private fun lineComment() {
+    private fun scanLineComment() {
         // A comment goes until the end of the line.
         while (peekNextChar() != Chars.NEW_LINE && !isAtEnd()) {
             consumeNextChar()
@@ -142,7 +142,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
     }
 
-    private fun string() {
+    private fun scanString() {
         var startLine = currentLineNumber
 
         while (peekNextChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
@@ -169,7 +169,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         currentLineNumber = startLine
     }
 
-    private fun number() {
+    private fun scanNumber() {
         while (peekNextChar().isDigit()) {
             consumeNextChar()
         }
@@ -189,7 +189,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         addToken(type = TokenType.NUMBER, literal = literal.toDouble())
     }
 
-    private fun identifier() {
+    private fun scanIdentifier() {
         while (peekNextChar().isAlphaNumeric()) {
             consumeNextChar()
         }
