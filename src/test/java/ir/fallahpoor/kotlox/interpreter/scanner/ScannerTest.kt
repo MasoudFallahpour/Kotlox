@@ -72,7 +72,7 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.TRUE, "true", null, 2),
+            Token(type = TokenType.TRUE, lexeme = "true", literal = null, lineNumber = 2),
             createEofTokenWithLineNumber(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -100,8 +100,8 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.FOR, "for", null, 1),
-            Token(TokenType.NUMBER, "123", 123.0, 7),
+            Token(type = TokenType.FOR, lexeme = "for", literal = null, lineNumber = 1),
+            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 7),
             createEofTokenWithLineNumber(7)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -116,7 +116,8 @@ class ScannerTest {
         val source =
             """
                 /* comment at level 1
-                   // some line comment here! *
+                   // some line comment here!
+                   *
                    /* comment at level 2
                        /* comment at level 3 */
                    */
@@ -130,8 +131,8 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 8),
-            createEofTokenWithLineNumber(8)
+            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 9),
+            createEofTokenWithLineNumber(9)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -155,12 +156,12 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.NUMBER, "123", 123.0, 1),
-            Token(TokenType.NUMBER, "123.456", 123.456, 2),
-            Token(TokenType.DOT, ".", null, 3),
-            Token(TokenType.NUMBER, "456", 456.0, 3),
-            Token(TokenType.NUMBER, "123", 123.0, 4),
-            Token(TokenType.DOT, ".", null, 4),
+            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 1),
+            Token(type = TokenType.NUMBER, lexeme = "123.456", literal = 123.456, lineNumber = 2),
+            Token(type = TokenType.DOT, lexeme = ".", literal = null, lineNumber = 3),
+            Token(type = TokenType.NUMBER, lexeme = "456", literal = 456.0, lineNumber = 3),
+            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 4),
+            Token(type = TokenType.DOT, lexeme = ".", literal = null, lineNumber = 4),
             createEofTokenWithLineNumber(4)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -182,16 +183,21 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.IDENTIFIER, "formation", null, 1),
-            Token(TokenType.IDENTIFIER, "_private", null, 1),
-            Token(TokenType.IDENTIFIER, "ARRAY_LENGTH", null, 1),
-            Token(TokenType.IDENTIFIER, "andy", null, 1),
-            Token(TokenType.IDENTIFIER, "fo", null, 1),
-            Token(TokenType.IDENTIFIER, "_", null, 1),
-            Token(TokenType.IDENTIFIER, "_123", null, 1),
-            Token(TokenType.IDENTIFIER, "_abc", null, 1),
-            Token(TokenType.IDENTIFIER, "ab123", null, 1),
-            Token(TokenType.IDENTIFIER, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", null, 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "formation", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "_private", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "ARRAY_LENGTH", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "andy", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "fo", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "_", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "_123", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "_abc", literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "ab123", literal = null, lineNumber = 1),
+            Token(
+                type = TokenType.IDENTIFIER,
+                lexeme = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_",
+                literal = null,
+                lineNumber = 1
+            ),
             createEofTokenWithLineNumber(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -215,8 +221,18 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.STRING, "\"This is a string\"", "This is a string", 1),
-            Token(TokenType.STRING, "\"This is a multi-line\nstring\"", "This is a multi-line\nstring", 2),
+            Token(
+                type = TokenType.STRING,
+                lexeme = "\"This is a string\"",
+                literal = "This is a string",
+                lineNumber = 1
+            ),
+            Token(
+                type = TokenType.STRING,
+                lexeme = "\"This is a multi-line\nstring\"",
+                literal = "This is a multi-line\nstring",
+                lineNumber = 2
+            ),
             createEofTokenWithLineNumber(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -239,17 +255,17 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.LEFT_PAREN, "(", null, 1),
-            Token(TokenType.RIGHT_PAREN, ")", null, 1),
-            Token(TokenType.LEFT_BRACE, "{", null, 1),
-            Token(TokenType.RIGHT_BRACE, "}", null, 1),
-            Token(TokenType.COMMA, ",", null, 1),
-            Token(TokenType.DOT, ".", null, 2),
-            Token(TokenType.PLUS, "+", null, 2),
-            Token(TokenType.MINUS, "-", null, 2),
-            Token(TokenType.SEMICOLON, ";", null, 2),
-            Token(TokenType.STAR, "*", null, 2),
-            Token(TokenType.SLASH, "/", null, 2),
+            Token(type = TokenType.LEFT_PAREN, lexeme = "(", literal = null, lineNumber = 1),
+            Token(type = TokenType.RIGHT_PAREN, lexeme = ")", literal = null, lineNumber = 1),
+            Token(type = TokenType.LEFT_BRACE, lexeme = "{", literal = null, lineNumber = 1),
+            Token(type = TokenType.RIGHT_BRACE, lexeme = "}", literal = null, lineNumber = 1),
+            Token(type = TokenType.COMMA, lexeme = ",", literal = null, lineNumber = 1),
+            Token(type = TokenType.DOT, lexeme = ".", literal = null, lineNumber = 2),
+            Token(type = TokenType.PLUS, lexeme = "+", literal = null, lineNumber = 2),
+            Token(type = TokenType.MINUS, lexeme = "-", literal = null, lineNumber = 2),
+            Token(type = TokenType.SEMICOLON, lexeme = ";", literal = null, lineNumber = 2),
+            Token(type = TokenType.STAR, lexeme = "*", literal = null, lineNumber = 2),
+            Token(type = TokenType.SLASH, lexeme = "/", literal = null, lineNumber = 2),
             createEofTokenWithLineNumber(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -271,14 +287,14 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.BANG_EQUAL, "!=", null, 1),
-            Token(TokenType.BANG, "!", null, 1),
-            Token(TokenType.EQUAL_EQUAL, "==", null, 1),
-            Token(TokenType.EQUAL, "=", null, 1),
-            Token(TokenType.GREATER, ">", null, 1),
-            Token(TokenType.GREATER_EQUAL, ">=", null, 1),
-            Token(TokenType.LESS_EQUAL, "<=", null, 1),
-            Token(TokenType.LESS, "<", null, 1),
+            Token(type = TokenType.BANG_EQUAL, lexeme = "!=", literal = null, lineNumber = 1),
+            Token(type = TokenType.BANG, lexeme = "!", literal = null, lineNumber = 1),
+            Token(type = TokenType.EQUAL_EQUAL, lexeme = "==", literal = null, lineNumber = 1),
+            Token(type = TokenType.EQUAL, lexeme = "=", literal = null, lineNumber = 1),
+            Token(type = TokenType.GREATER, lexeme = ">", literal = null, lineNumber = 1),
+            Token(type = TokenType.GREATER_EQUAL, lexeme = ">=", literal = null, lineNumber = 1),
+            Token(type = TokenType.LESS_EQUAL, lexeme = "<=", literal = null, lineNumber = 1),
+            Token(type = TokenType.LESS, lexeme = "<", literal = null, lineNumber = 1),
             createEofTokenWithLineNumber(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -301,26 +317,26 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(TokenType.AND, Keywords.AND, null, 1),
-            Token(TokenType.CLASS, Keywords.CLASS, null, 1),
-            Token(TokenType.ELSE, Keywords.ELSE, null, 1),
-            Token(TokenType.FALSE, Keywords.FALSE, null, 1),
-            Token(TokenType.FUN, Keywords.FUN, null, 1),
-            Token(TokenType.FOR, Keywords.FOR, null, 1),
-            Token(TokenType.IF, Keywords.IF, null, 1),
-            Token(TokenType.NIL, Keywords.NIL, null, 1),
-            Token(TokenType.OR, Keywords.OR, null, 1),
-            Token(TokenType.PRINT, Keywords.PRINT, null, 1),
-            Token(TokenType.RETURN, Keywords.RETURN, null, 1),
-            Token(TokenType.SUPER, Keywords.SUPER, null, 1),
-            Token(TokenType.THIS, Keywords.THIS, null, 1),
-            Token(TokenType.TRUE, Keywords.TRUE, null, 1),
-            Token(TokenType.VAR, Keywords.VAR, null, 1),
-            Token(TokenType.WHILE, Keywords.WHILE, null, 1),
-            Token(TokenType.IDENTIFIER, "android", null, 2),
-            Token(TokenType.IDENTIFIER, "classic", null, 2),
-            Token(TokenType.IDENTIFIER, "elsewhere", null, 2),
-            Token(TokenType.IDENTIFIER, "superstitious", null, 2),
+            Token(type = TokenType.AND, lexeme = Keywords.AND, literal = null, lineNumber = 1),
+            Token(type = TokenType.CLASS, lexeme = Keywords.CLASS, literal = null, lineNumber = 1),
+            Token(type = TokenType.ELSE, lexeme = Keywords.ELSE, literal = null, lineNumber = 1),
+            Token(type = TokenType.FALSE, lexeme = Keywords.FALSE, literal = null, lineNumber = 1),
+            Token(type = TokenType.FUN, lexeme = Keywords.FUN, literal = null, lineNumber = 1),
+            Token(type = TokenType.FOR, lexeme = Keywords.FOR, literal = null, lineNumber = 1),
+            Token(type = TokenType.IF, lexeme = Keywords.IF, literal = null, lineNumber = 1),
+            Token(type = TokenType.NIL, lexeme = Keywords.NIL, literal = null, lineNumber = 1),
+            Token(type = TokenType.OR, lexeme = Keywords.OR, literal = null, lineNumber = 1),
+            Token(type = TokenType.PRINT, lexeme = Keywords.PRINT, literal = null, lineNumber = 1),
+            Token(type = TokenType.RETURN, lexeme = Keywords.RETURN, literal = null, lineNumber = 1),
+            Token(type = TokenType.SUPER, lexeme = Keywords.SUPER, literal = null, lineNumber = 1),
+            Token(type = TokenType.THIS, lexeme = Keywords.THIS, literal = null, lineNumber = 1),
+            Token(type = TokenType.TRUE, lexeme = Keywords.TRUE, literal = null, lineNumber = 1),
+            Token(type = TokenType.VAR, lexeme = Keywords.VAR, literal = null, lineNumber = 1),
+            Token(type = TokenType.WHILE, lexeme = Keywords.WHILE, literal = null, lineNumber = 1),
+            Token(type = TokenType.IDENTIFIER, lexeme = "android", literal = null, lineNumber = 2),
+            Token(type = TokenType.IDENTIFIER, lexeme = "classic", literal = null, lineNumber = 2),
+            Token(type = TokenType.IDENTIFIER, lexeme = "elsewhere", literal = null, lineNumber = 2),
+            Token(type = TokenType.IDENTIFIER, lexeme = "superstitious", literal = null, lineNumber = 2),
             createEofTokenWithLineNumber(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
@@ -341,7 +357,7 @@ class ScannerTest {
         scanSource(source)
 
         // Then
-        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnexpectedChar('$'))
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnexpectedChar('$'))
         Mockito.verifyNoMoreInteractions(errorReporter)
     }
 
@@ -358,7 +374,7 @@ class ScannerTest {
         scanSource(source)
 
         // Then
-        Mockito.verify(errorReporter).error(1, ErrorReporter.Error.UnterminatedString)
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedString)
         Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
@@ -377,7 +393,7 @@ class ScannerTest {
         scanSource(source)
 
         // Then
-        Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verify(errorReporter).error(line = 2, error = ErrorReporter.Error.UnterminatedBlockComment)
         Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
@@ -402,7 +418,7 @@ class ScannerTest {
         scanSource(source)
 
         // Then
-        Mockito.verify(errorReporter).error(8, ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verify(errorReporter).error(line = 8, error = ErrorReporter.Error.UnterminatedBlockComment)
         Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
