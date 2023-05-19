@@ -9,8 +9,8 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     // Offset that indexes into the 'source' string. It points to the first character in the lexeme being scanned
     private var lexemeStartIndex = 0
 
-    // Offset that indexes into the 'source' string. It points at the character currently being considered
-    private var currentCharIndex = 0
+    // Offset that indexes into the 'source' string. It points at the next character to be considered.
+    private var nextCharIndex = 0
 
     // Tracks what source line 'currentCharIndex' is on
     private var currentLineNumber = 1
@@ -18,17 +18,17 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     fun scanTokens(): List<Token> {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
-            lexemeStartIndex = currentCharIndex
+            lexemeStartIndex = nextCharIndex
             scanToken()
         }
         tokens += Token(type = TokenType.EOF, lexeme = "", literal = null, lineNumber = currentLineNumber)
         return tokens
     }
 
-    private fun isAtEnd() = currentCharIndex >= source.length
+    private fun isAtEnd() = nextCharIndex >= source.length
 
     private fun scanToken() {
-        when (val char = consumeCurrentChar()) {
+        when (val char = consumeNextChar()) {
             Chars.LEFT_PAREN -> addToken(TokenType.LEFT_PAREN)
             Chars.RIGHT_PAREN -> addToken(TokenType.RIGHT_PAREN)
             Chars.LEFT_BRACE -> addToken(TokenType.LEFT_BRACE)
@@ -46,7 +46,7 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
             Chars.SLASH -> {
                 when {
                     nextCharMatches(Chars.SLASH) -> lineComment()
-                    nextCharMatches(Chars.STAR) -> blockComment()
+                    nextCharMatches(Chars.STAR) -> scanBlockComment()
                     else -> addToken(TokenType.SLASH)
                 }
             }
@@ -63,64 +63,81 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
     }
 
-    private fun consumeCurrentChar(): Char = source[currentCharIndex++]
+    private fun consumeNextChar(): Char = source[nextCharIndex++]
 
     private fun addToken(type: TokenType, literal: Any? = null) {
-        val text = source.substring(lexemeStartIndex, currentCharIndex)
+        val text = source.substring(lexemeStartIndex, nextCharIndex)
         tokens += Token(type = type, lexeme = text, literal = literal, lineNumber = currentLineNumber)
     }
 
-    // Look ahead the next char. If it matches the given 'expected' char then consume it and return true,
-    // otherwise don't consume it and return false.
+    // Check the current character. If it matches the given 'expected' character then consume it and
+    // return true, otherwise don't consume it and return false.
     private fun nextCharMatches(expected: Char): Boolean = if (isAtEnd()) {
         false
-    } else if (source[currentCharIndex] != expected) {
+    } else if (source[nextCharIndex] != expected) {
         false
     } else {
-        currentCharIndex++
+        nextCharIndex++
         true
     }
 
     // Get the next char without consuming it.
-    private fun peekCurrentChar(): Char = if (isAtEnd()) {
+    private fun peekNextChar(): Char = if (isAtEnd()) {
         // TODO Verify that the following Unicode char is the correct character to use because the original
         //  character from the source code of the book is '\0'
         '\u0000'
     } else {
-        source[currentCharIndex]
+        source[nextCharIndex]
     }
 
     // Get the character after the next character without consuming it.
-    private fun peekNextChar(): Char = if (currentCharIndex + 1 >= source.length) {
+    private fun peekNextNextChar(): Char = if (nextCharIndex + 1 >= source.length) {
         // TODO Verify that the following Unicode char is the correct character to use because the original
         //  character from the source code of the book is '\0'
         '\u0000'
     } else {
-        source[currentCharIndex + 1]
+        source[nextCharIndex + 1]
     }
 
     private fun lineComment() {
         // A comment goes until the end of the line.
-        while (peekCurrentChar() != Chars.NEW_LINE && !isAtEnd()) {
-            consumeCurrentChar()
+        while (peekNextChar() != Chars.NEW_LINE && !isAtEnd()) {
+            consumeNextChar()
         }
     }
 
-    private fun blockComment() {
-        var blockCommentConsumed = false
+    private fun scanBlockComment() {
+        var blockCommentScannedSuccessfully = false
+        var blockCommentBeginningSeenCount = 1
 
-        while (!blockCommentConsumed && !isAtEnd()) {
-            if (peekCurrentChar() == Chars.NEW_LINE) {
-                currentLineNumber++
-                consumeCurrentChar()
-            } else if (consumeCurrentChar() == Chars.STAR) {
-                if (consumeCurrentChar() == Chars.SLASH) {
-                    blockCommentConsumed = true
+        while (!blockCommentScannedSuccessfully && !isAtEnd()) {
+            when {
+                nextCharMatches(Chars.NEW_LINE) -> {
+                    currentLineNumber++
+                }
+
+                nextCharMatches(Chars.SLASH) -> {
+                    if (nextCharMatches(Chars.STAR)) {
+                        blockCommentBeginningSeenCount++
+                    }
+                }
+
+                nextCharMatches(Chars.STAR) -> {
+                    if (nextCharMatches(Chars.SLASH)) {
+                        blockCommentBeginningSeenCount--
+                        if (blockCommentBeginningSeenCount == 0) {
+                            blockCommentScannedSuccessfully = true
+                        }
+                    }
+                }
+
+                else -> {
+                    consumeNextChar()
                 }
             }
         }
 
-        if (!blockCommentConsumed) {
+        if (!blockCommentScannedSuccessfully) {
             errorReporter.error(currentLineNumber, ErrorReporter.Error.UnterminatedBlockComment)
         }
     }
@@ -128,11 +145,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     private fun string() {
         var startLine = currentLineNumber
 
-        while (peekCurrentChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
-            if (peekCurrentChar() == Chars.NEW_LINE) {
+        while (peekNextChar() != Chars.DOUBLE_QUOTES && !isAtEnd()) {
+            if (peekNextChar() == Chars.NEW_LINE) {
                 startLine++
             }
-            consumeCurrentChar()
+            consumeNextChar()
         }
 
         if (isAtEnd()) {
@@ -141,11 +158,11 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
         }
 
         // The closing "
-        consumeCurrentChar()
+        consumeNextChar()
 
         // If Lox supported escape sequences like \n, we’d unescape those here.
         // Get rid of the surrounding quotes.
-        val literal = source.substring(lexemeStartIndex + 1, currentCharIndex - 1)
+        val literal = source.substring(lexemeStartIndex + 1, nextCharIndex - 1)
 
         addToken(type = TokenType.STRING, literal = literal)
 
@@ -153,31 +170,31 @@ class Scanner(private val source: String, private val errorReporter: ErrorReport
     }
 
     private fun number() {
-        while (peekCurrentChar().isDigit()) {
-            consumeCurrentChar()
+        while (peekNextChar().isDigit()) {
+            consumeNextChar()
         }
 
         // Look for a fractional part.
-        if (peekCurrentChar() == Chars.DOT && peekNextChar().isDigit()) {
+        if (peekNextChar() == Chars.DOT && peekNextNextChar().isDigit()) {
             // Consume the "."
-            consumeCurrentChar()
+            consumeNextChar()
 
-            while (peekCurrentChar().isDigit()) {
-                consumeCurrentChar()
+            while (peekNextChar().isDigit()) {
+                consumeNextChar()
             }
         }
 
-        val literal = source.substring(lexemeStartIndex, currentCharIndex)
+        val literal = source.substring(lexemeStartIndex, nextCharIndex)
 
         addToken(type = TokenType.NUMBER, literal = literal.toDouble())
     }
 
     private fun identifier() {
-        while (peekCurrentChar().isAlphaNumeric()) {
-            consumeCurrentChar()
+        while (peekNextChar().isAlphaNumeric()) {
+            consumeNextChar()
         }
 
-        val lexeme = source.substring(lexemeStartIndex, currentCharIndex)
+        val lexeme = source.substring(lexemeStartIndex, nextCharIndex)
         val tokenType: TokenType = Keywords.getTokenTypeFor(lexeme) ?: TokenType.IDENTIFIER
 
         addToken(tokenType)

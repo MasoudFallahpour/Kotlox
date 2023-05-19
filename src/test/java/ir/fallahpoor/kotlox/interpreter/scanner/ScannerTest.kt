@@ -19,7 +19,8 @@ class ScannerTest {
         return scanner.scanTokens()
     }
 
-    private fun createEofToken(line: Int) = Token(TokenType.EOF, "", null, line)
+    private fun createEofTokenWithLineNumber(line: Int) =
+        Token(type = TokenType.EOF, lexeme = "", literal = null, lineNumber = line)
 
     @Test
     fun emptySource() {
@@ -31,7 +32,7 @@ class ScannerTest {
         val actualTokens = scanSource(source)
 
         // Then
-        val expectedTokens = listOf(createEofToken(1))
+        val expectedTokens = listOf(createEofTokenWithLineNumber(1))
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -50,7 +51,7 @@ class ScannerTest {
         val actualTokens = scanSource(source)
 
         // Then
-        val expectedTokens = listOf(createEofToken(1))
+        val expectedTokens = listOf(createEofTokenWithLineNumber(1))
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
 
@@ -72,7 +73,7 @@ class ScannerTest {
         // Then
         val expectedTokens = listOf(
             Token(TokenType.TRUE, "true", null, 2),
-            createEofToken(2)
+            createEofTokenWithLineNumber(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -101,7 +102,36 @@ class ScannerTest {
         val expectedTokens = listOf(
             Token(TokenType.FOR, "for", null, 1),
             Token(TokenType.NUMBER, "123", 123.0, 7),
-            createEofToken(7)
+            createEofTokenWithLineNumber(7)
+        )
+        Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testNestedBlockComments() {
+
+        // Given
+        val source =
+            """
+                /* comment at level 1
+                   // some line comment here! *
+                   /* comment at level 2
+                       /* comment at level 3 */
+                   */
+                   comment at level 1
+                */
+                123
+                """
+
+        // When
+        val actualTokens = scanSource(source)
+
+        // Then
+        val expectedTokens = listOf(
+            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 8),
+            createEofTokenWithLineNumber(8)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -131,7 +161,7 @@ class ScannerTest {
             Token(TokenType.NUMBER, "456", 456.0, 3),
             Token(TokenType.NUMBER, "123", 123.0, 4),
             Token(TokenType.DOT, ".", null, 4),
-            createEofToken(4)
+            createEofTokenWithLineNumber(4)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -162,7 +192,7 @@ class ScannerTest {
             Token(TokenType.IDENTIFIER, "_abc", null, 1),
             Token(TokenType.IDENTIFIER, "ab123", null, 1),
             Token(TokenType.IDENTIFIER, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_", null, 1),
-            createEofToken(1)
+            createEofTokenWithLineNumber(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -187,7 +217,7 @@ class ScannerTest {
         val expectedTokens = listOf(
             Token(TokenType.STRING, "\"This is a string\"", "This is a string", 1),
             Token(TokenType.STRING, "\"This is a multi-line\nstring\"", "This is a multi-line\nstring", 2),
-            createEofToken(3)
+            createEofTokenWithLineNumber(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -220,7 +250,7 @@ class ScannerTest {
             Token(TokenType.SEMICOLON, ";", null, 2),
             Token(TokenType.STAR, "*", null, 2),
             Token(TokenType.SLASH, "/", null, 2),
-            createEofToken(2)
+            createEofTokenWithLineNumber(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -249,7 +279,7 @@ class ScannerTest {
             Token(TokenType.GREATER_EQUAL, ">=", null, 1),
             Token(TokenType.LESS_EQUAL, "<=", null, 1),
             Token(TokenType.LESS, "<", null, 1),
-            createEofToken(1)
+            createEofTokenWithLineNumber(1)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -291,7 +321,7 @@ class ScannerTest {
             Token(TokenType.IDENTIFIER, "classic", null, 2),
             Token(TokenType.IDENTIFIER, "elsewhere", null, 2),
             Token(TokenType.IDENTIFIER, "superstitious", null, 2),
-            createEofToken(2)
+            createEofTokenWithLineNumber(2)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -348,6 +378,31 @@ class ScannerTest {
 
         // Then
         Mockito.verify(errorReporter).error(2, ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verifyNoMoreInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun testUnterminatedNestedBlockCommentError() {
+
+        // Given
+        val source =
+            """
+                /* level 1
+                   /* level 2
+                       /* level 3
+                       level 2
+                   */
+                   level 1
+                */
+                123
+                """
+
+        // When
+        scanSource(source)
+
+        // Then
+        Mockito.verify(errorReporter).error(8, ErrorReporter.Error.UnterminatedBlockComment)
         Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
