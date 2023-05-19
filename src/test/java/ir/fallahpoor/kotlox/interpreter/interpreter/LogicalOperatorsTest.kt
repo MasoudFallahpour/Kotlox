@@ -7,6 +7,7 @@ import ir.fallahpoor.kotlox.interpreter.TestPrinter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
+import ir.fallahpoor.kotlox.interpreter.scanner.SourceCodeReader
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -136,7 +137,7 @@ class LogicalOperatorsTest {
     }
 
     private fun parseSource(source: String): List<Stmt> {
-        val scanner = Scanner(source.trimIndent(), errorReporter)
+        val scanner = Scanner(SourceCodeReader(source.trimIndent()), errorReporter)
         val tokens: List<Token> = scanner.scanTokens()
         val parser = Parser(Tokens(tokens), errorReporter)
         return parser.parse()

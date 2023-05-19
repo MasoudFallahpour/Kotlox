@@ -7,6 +7,7 @@ import ir.fallahpoor.kotlox.interpreter.TestPrinter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
+import ir.fallahpoor.kotlox.interpreter.scanner.SourceCodeReader
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import ir.fallahpoor.kotlox.interpreter.scanner.TokenType
 import org.junit.Test
@@ -135,7 +136,7 @@ class FunctionTest {
     }
 
     private fun parseSource(source: String): List<Stmt> {
-        val scanner = Scanner(source.trimIndent(), errorReporter)
+        val scanner = Scanner(SourceCodeReader(source.trimIndent()), errorReporter)
         val tokens: List<Token> = scanner.scanTokens()
         val parser = Parser(Tokens(tokens), errorReporter)
         return parser.parse()

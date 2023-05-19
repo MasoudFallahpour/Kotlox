@@ -4,6 +4,7 @@ import ir.fallahpoor.kotlox.interpreter.interpreter.Interpreter
 import ir.fallahpoor.kotlox.interpreter.parser.Parser
 import ir.fallahpoor.kotlox.interpreter.parser.Tokens
 import ir.fallahpoor.kotlox.interpreter.scanner.Scanner
+import ir.fallahpoor.kotlox.interpreter.scanner.SourceCodeReader
 import ir.fallahpoor.kotlox.interpreter.scanner.Token
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -93,7 +94,7 @@ class Lox(private val commandLineArgs: Array<String>) {
     }
 
     private fun parseSource(source: String): List<Stmt> {
-        val scanner = Scanner(source, errorReporter)
+        val scanner = Scanner(SourceCodeReader(source), errorReporter)
         val tokens: List<Token> = scanner.scanTokens()
         val parser = Parser(Tokens(tokens), errorReporter)
         return parser.parse()

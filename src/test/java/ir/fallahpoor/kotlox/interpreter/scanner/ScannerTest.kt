@@ -15,7 +15,7 @@ class ScannerTest {
     private lateinit var errorReporter: ErrorReporter
 
     private fun scanSource(source: String): List<Token> {
-        val scanner = Scanner(source.trimIndent(), errorReporter)
+        val scanner = Scanner(SourceCodeReader(source.trimIndent()), errorReporter)
         return scanner.scanTokens()
     }
 
