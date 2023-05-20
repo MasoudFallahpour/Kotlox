@@ -2,7 +2,10 @@ package ir.fallahpoor.kotlox.interpreter.scanner
 
 import ir.fallahpoor.kotlox.interpreter.ErrorReporter
 
-class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorReporter: ErrorReporter) {
+class Scanner(
+    private val sourceCodeReader: SourceCodeReader,
+    private val errorReporter: ErrorReporter
+) {
 
     private val tokens = mutableListOf<Token>()
 
@@ -23,25 +26,25 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
 
     private fun scanToken() {
         when (val char = sourceCodeReader.consumeNextChar()) {
-            Chars.LEFT_PAREN -> addToken(TokenType.LEFT_PAREN)
-            Chars.RIGHT_PAREN -> addToken(TokenType.RIGHT_PAREN)
-            Chars.LEFT_BRACE -> addToken(TokenType.LEFT_BRACE)
-            Chars.RIGHT_BRACE -> addToken(TokenType.RIGHT_BRACE)
-            Chars.COMMA -> addToken(TokenType.COMMA)
-            Chars.DOT -> addToken(TokenType.DOT)
-            Chars.MINUS -> addToken(TokenType.MINUS)
-            Chars.PLUS -> addToken(TokenType.PLUS)
-            Chars.SEMICOLON -> addToken(TokenType.SEMICOLON)
-            Chars.STAR -> addToken(TokenType.STAR)
-            Chars.BANG -> addToken(if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.BANG_EQUAL else TokenType.BANG)
-            Chars.EQUAL -> addToken(if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
-            Chars.LESS -> addToken(if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.LESS_EQUAL else TokenType.LESS)
-            Chars.GREATER -> addToken(if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.GREATER_EQUAL else TokenType.GREATER)
+            Chars.LEFT_PAREN -> addToken(tokenType = TokenType.LEFT_PAREN)
+            Chars.RIGHT_PAREN -> addToken(tokenType = TokenType.RIGHT_PAREN)
+            Chars.LEFT_BRACE -> addToken(tokenType = TokenType.LEFT_BRACE)
+            Chars.RIGHT_BRACE -> addToken(tokenType = TokenType.RIGHT_BRACE)
+            Chars.COMMA -> addToken(tokenType = TokenType.COMMA)
+            Chars.DOT -> addToken(tokenType = TokenType.DOT)
+            Chars.MINUS -> addToken(tokenType = TokenType.MINUS)
+            Chars.PLUS -> addToken(tokenType = TokenType.PLUS)
+            Chars.SEMICOLON -> addToken(tokenType = TokenType.SEMICOLON)
+            Chars.STAR -> addToken(tokenType = TokenType.STAR)
+            Chars.BANG -> addToken(tokenType = if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.BANG_EQUAL else TokenType.BANG)
+            Chars.EQUAL -> addToken(tokenType = if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
+            Chars.LESS_THAN -> addToken(tokenType = if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.LESS_EQUAL else TokenType.LESS)
+            Chars.GREATER_THAN -> addToken(tokenType = if (sourceCodeReader.nextCharMatches(Chars.EQUAL)) TokenType.GREATER_EQUAL else TokenType.GREATER)
             Chars.SLASH -> {
                 when {
                     sourceCodeReader.nextCharMatches(Chars.SLASH) -> scanLineComment()
                     sourceCodeReader.nextCharMatches(Chars.STAR) -> scanBlockComment()
-                    else -> addToken(TokenType.SLASH)
+                    else -> addToken(tokenType = TokenType.SLASH)
                 }
             }
 
@@ -60,10 +63,10 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
         }
     }
 
-    private fun addToken(type: TokenType, literal: Any? = null) {
+    private fun addToken(tokenType: TokenType, literal: Any? = null) {
         val lexeme: String = sourceCodeReader.getLexeme()
         tokens += Token(
-            type = type,
+            type = tokenType,
             lexeme = lexeme,
             literal = literal,
             lineNumber = sourceCodeReader.currentLineNumber
@@ -80,11 +83,13 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
     private fun scanBlockComment() {
         var blockCommentScannedSuccessfully = false
         var blockCommentBeginningSeenCount = 1
+        var blockCommentEndingSeenCount = 0
+        var currentLineNumber = sourceCodeReader.currentLineNumber
 
         while (!blockCommentScannedSuccessfully && !sourceCodeReader.isAtEnd()) {
             when {
                 sourceCodeReader.nextCharMatches(Chars.NEW_LINE) -> {
-                    sourceCodeReader.currentLineNumber++
+                    currentLineNumber++
                 }
 
                 sourceCodeReader.nextCharMatches(Chars.SLASH) -> {
@@ -95,8 +100,8 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
 
                 sourceCodeReader.nextCharMatches(Chars.STAR) -> {
                     if (sourceCodeReader.nextCharMatches(Chars.SLASH)) {
-                        blockCommentBeginningSeenCount--
-                        if (blockCommentBeginningSeenCount == 0) {
+                        blockCommentEndingSeenCount++
+                        if (blockCommentBeginningSeenCount == blockCommentEndingSeenCount) {
                             blockCommentScannedSuccessfully = true
                         }
                     }
@@ -108,23 +113,31 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
             }
         }
 
-        if (!blockCommentScannedSuccessfully) {
-            errorReporter.error(sourceCodeReader.currentLineNumber, ErrorReporter.Error.UnterminatedBlockComment)
+        if (sourceCodeReader.isAtEnd()) {
+            errorReporter.error(
+                line = sourceCodeReader.currentLineNumber,
+                error = ErrorReporter.Error.UnterminatedBlockComment
+            )
+        } else {
+            sourceCodeReader.currentLineNumber = currentLineNumber
         }
     }
 
     private fun scanString() {
-        var startLine = sourceCodeReader.currentLineNumber
+        var currentLineNumber = sourceCodeReader.currentLineNumber
 
         while (sourceCodeReader.peekNextChar() != Chars.DOUBLE_QUOTES && !sourceCodeReader.isAtEnd()) {
             if (sourceCodeReader.peekNextChar() == Chars.NEW_LINE) {
-                startLine++
+                currentLineNumber++
             }
             sourceCodeReader.consumeNextChar()
         }
 
         if (sourceCodeReader.isAtEnd()) {
-            errorReporter.error(sourceCodeReader.currentLineNumber, ErrorReporter.Error.UnterminatedString)
+            errorReporter.error(
+                line = sourceCodeReader.currentLineNumber,
+                error = ErrorReporter.Error.UnterminatedString
+            )
             return
         }
 
@@ -135,10 +148,9 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
         // If Lox supported escape sequences like \n, we’d unescape those here.
         // Get rid of the surrounding quotes.
         val literal: String = lexeme.substring(startIndex = 1, endIndex = lexeme.lastIndex)
+        addToken(tokenType = TokenType.STRING, literal = literal)
 
-        addToken(type = TokenType.STRING, literal = literal)
-
-        sourceCodeReader.currentLineNumber = startLine
+        sourceCodeReader.currentLineNumber = currentLineNumber
     }
 
     private fun scanNumber() {
@@ -157,19 +169,16 @@ class Scanner(private val sourceCodeReader: SourceCodeReader, private val errorR
         }
 
         val literal: String = sourceCodeReader.getLexeme()
-
-        addToken(type = TokenType.NUMBER, literal = literal.toDouble())
+        addToken(tokenType = TokenType.NUMBER, literal = literal.toDouble())
     }
 
     private fun scanIdentifier() {
         while (sourceCodeReader.peekNextChar().isAlphaNumeric()) {
             sourceCodeReader.consumeNextChar()
         }
-
-        val lexeme = sourceCodeReader.getLexeme()
-        val tokenType: TokenType = Keywords.getTokenTypeFor(lexeme) ?: TokenType.IDENTIFIER
-
-        addToken(tokenType)
+        val lexeme: String = sourceCodeReader.getLexeme()
+        val tokenType: TokenType = Keywords.getTokenTypeFor(lexeme = lexeme) ?: TokenType.IDENTIFIER
+        addToken(tokenType = tokenType)
     }
 
     private fun Char.isAlpha(): Boolean =

@@ -368,6 +368,7 @@ class ScannerTest {
         val source =
             """
                 "abc
+                def
                 """
 
         // When
@@ -393,7 +394,7 @@ class ScannerTest {
         scanSource(source)
 
         // Then
-        Mockito.verify(errorReporter).error(line = 2, error = ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedBlockComment)
         Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
@@ -418,7 +419,7 @@ class ScannerTest {
         scanSource(source)
 
         // Then
-        Mockito.verify(errorReporter).error(line = 8, error = ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedBlockComment)
         Mockito.verifyNoMoreInteractions(errorReporter)
 
     }
