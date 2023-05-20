@@ -23,7 +23,7 @@ class ScannerTest {
         Token(type = TokenType.EOF, lexeme = "", literal = null, lineNumber = line)
 
     @Test
-    fun emptySource() {
+    fun `empty source code produces no token`() {
 
         // Given
         val source = ""
@@ -39,7 +39,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testWhitespace() {
+    fun `whitespace produces no token`() {
 
         // Given
         val source =
@@ -58,7 +58,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testLineComment() {
+    fun `line comment is scanned and ignored`() {
 
         // Given
         val source =
@@ -81,7 +81,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testBlockComment() {
+    fun `block comment is scanned and ignored`() {
 
         // Given
         val source =
@@ -110,7 +110,26 @@ class ScannerTest {
     }
 
     @Test
-    fun testNestedBlockComments() {
+    fun `unterminated block comment reports an error`() {
+
+        // Given
+        val source =
+            """
+                /* this is an unterminated block comment
+                   here we are on the next line
+                """
+
+        // When
+        scanSource(source)
+
+        // Then
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verifyNoMoreInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun `nested block comment is scanned and ignored`() {
 
         // Given
         val source =
@@ -140,12 +159,60 @@ class ScannerTest {
     }
 
     @Test
-    fun testNumber() {
+    fun `unterminated nested block comment reports an error`() {
 
         // Given
         val source =
             """
+                /* level 1
+                   /* level 2
+                       /* level 3
+                       level 2
+                   */
+                   level 1
+                */
                 123
+                """
+
+        // When
+        scanSource(source)
+
+        // Then
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedBlockComment)
+        Mockito.verifyNoMoreInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun `integer numbers are scanned correctly`() {
+
+        // Given
+        val source =
+            """
+                1 23 456
+                """
+
+        // When
+        val actualTokens = scanSource(source)
+
+        // Then
+        val expectedTokens = listOf(
+            Token(type = TokenType.NUMBER, lexeme = "1", literal = 1.0, lineNumber = 1),
+            Token(type = TokenType.NUMBER, lexeme = "23", literal = 23.0, lineNumber = 1),
+            Token(type = TokenType.NUMBER, lexeme = "456", literal = 456.0, lineNumber = 1),
+            createEofTokenWithLineNumber(1)
+        )
+        Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
+        Mockito.verifyNoInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun `floating-point numbers are scanned correctly`() {
+
+        // Given
+        val source =
+            """
                 123.456
                 .456
                 123.
@@ -156,13 +223,12 @@ class ScannerTest {
 
         // Then
         val expectedTokens = listOf(
-            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 1),
-            Token(type = TokenType.NUMBER, lexeme = "123.456", literal = 123.456, lineNumber = 2),
+            Token(type = TokenType.NUMBER, lexeme = "123.456", literal = 123.456, lineNumber = 1),
+            Token(type = TokenType.DOT, lexeme = ".", literal = null, lineNumber = 2),
+            Token(type = TokenType.NUMBER, lexeme = "456", literal = 456.0, lineNumber = 2),
+            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 3),
             Token(type = TokenType.DOT, lexeme = ".", literal = null, lineNumber = 3),
-            Token(type = TokenType.NUMBER, lexeme = "456", literal = 456.0, lineNumber = 3),
-            Token(type = TokenType.NUMBER, lexeme = "123", literal = 123.0, lineNumber = 4),
-            Token(type = TokenType.DOT, lexeme = ".", literal = null, lineNumber = 4),
-            createEofTokenWithLineNumber(4)
+            createEofTokenWithLineNumber(3)
         )
         Truth.assertThat(actualTokens).isEqualTo(expectedTokens)
         Mockito.verifyNoInteractions(errorReporter)
@@ -170,7 +236,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testIdentifier() {
+    fun `identifiers are scanned correctly`() {
 
         // Given
         val source =
@@ -206,7 +272,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testString() {
+    fun `strings are scanned correctly`() {
 
         // Given
         val source =
@@ -241,7 +307,26 @@ class ScannerTest {
     }
 
     @Test
-    fun testSingleCharTokens() {
+    fun `unterminated string reports an error`() {
+
+        // Given
+        val source =
+            """
+                "abc
+                def
+                """
+
+        // When
+        scanSource(source)
+
+        // Then
+        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedString)
+        Mockito.verifyNoMoreInteractions(errorReporter)
+
+    }
+
+    @Test
+    fun `single character tokens are scanned correctly`() {
 
         // Given
         val source =
@@ -274,7 +359,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testOneOrTwoCharTokens() {
+    fun `two character tokens are scanned correctly`() {
 
         // Given
         val source =
@@ -303,7 +388,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testKeywords() {
+    fun `keywords are scanned correctly`() {
 
         // Given
         val source =
@@ -345,7 +430,7 @@ class ScannerTest {
     }
 
     @Test
-    fun testUnexpectedCharError() {
+    fun `unexpected character reports an error`() {
 
         // Given
         val source =
@@ -359,69 +444,6 @@ class ScannerTest {
         // Then
         Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnexpectedChar('$'))
         Mockito.verifyNoMoreInteractions(errorReporter)
-    }
-
-    @Test
-    fun testUnterminatedStringError() {
-
-        // Given
-        val source =
-            """
-                "abc
-                def
-                """
-
-        // When
-        scanSource(source)
-
-        // Then
-        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedString)
-        Mockito.verifyNoMoreInteractions(errorReporter)
-
-    }
-
-    @Test
-    fun testUnterminatedBlockCommentError() {
-
-        // Given
-        val source =
-            """
-                /* this is an unterminated block comment
-                   here we are on the next line
-                """
-
-        // When
-        scanSource(source)
-
-        // Then
-        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedBlockComment)
-        Mockito.verifyNoMoreInteractions(errorReporter)
-
-    }
-
-    @Test
-    fun testUnterminatedNestedBlockCommentError() {
-
-        // Given
-        val source =
-            """
-                /* level 1
-                   /* level 2
-                       /* level 3
-                       level 2
-                   */
-                   level 1
-                */
-                123
-                """
-
-        // When
-        scanSource(source)
-
-        // Then
-        Mockito.verify(errorReporter).error(line = 1, error = ErrorReporter.Error.UnterminatedBlockComment)
-        Mockito.verifyNoMoreInteractions(errorReporter)
-
     }
 
 }
